@@ -17,9 +17,10 @@ h1{margin:0;font-size:24px;}
 .layout{display:grid;grid-template-columns:1fr;gap:20px;margin-top:20px;}
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
 .card{background:#fff;border:1px solid #eef6ff;border-radius:8px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;transition:0.2s;padding:8px;}
-.card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-.card img{width:100%;height:120px;object-fit:cover;border-radius:6px;}
-.add-card{background:#1765c1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:40px;}
+.card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+.card img{width:100%;height:auto;object-fit:cover;border-radius:6px;}
+.add-card{background:#1765c1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:40px;cursor:pointer;transition:0.2s;}
+.add-card:hover{background:#0e4a8b;}
 .form-container{background:#fff;padding:16px;border-radius:10px;max-width:720px;width:100%;margin:auto;}
 .form{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff;max-height:60vh;overflow-y:auto;}
 label{display:block;font-size:13px;margin:6px 0 2px;}
@@ -30,6 +31,9 @@ input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-rad
 .flag-btn:hover{background:#e1f0ff;}
 #uploadBtn{background:#1765c1;color:#fff;padding:8px 14px;border-radius:6px;cursor:pointer;border:none;transition:0.2s;}
 #uploadBtn:hover{background:#0e4a8b;}
+.action-btn{background:#1765c1;color:#fff;padding:6px 12px;border-radius:6px;border:none;cursor:pointer;transition:0.2s;margin-right:6px;}
+.action-btn:hover{background:#0e4a8b;}
+#playerSearch{padding:8px;border:1px solid #d9e4f5;border-radius:6px;width:100%;margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -77,8 +81,8 @@ input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-rad
       <input type="file" id="uploadImg" accept="image/*" style="display:none">
       <img id="preview" style="max-width:120px;margin-top:8px;display:block">
       <div style="display:flex;gap:8px;margin-top:10px">
-        <button onclick="savePlayer()">Enregistrer</button>
-        <button onclick="closeForm()" style="background:#eee;color:#111">Annuler</button>
+        <button class="action-btn" onclick="savePlayer()">Enregistrer</button>
+        <button class="action-btn" style="background:#eee;color:#111;" onclick="closeForm()">Annuler</button>
       </div>
     </div>
   </div>
@@ -108,19 +112,30 @@ function saveToStorage(){ localStorage.setItem("wokipediaPlayers", JSON.stringif
 function showMenu(){
   document.getElementById('formbox').style.display='none';
   const container=document.getElementById('mainContainer'); container.innerHTML='';
+
+  // Search bar
+  const searchInput=document.createElement('input');
+  searchInput.id='playerSearch'; searchInput.placeholder='Rechercher un joueur...';
+  searchInput.oninput=renderCards;
+  container.appendChild(searchInput);
+
   const grid = document.createElement('div'); grid.className='card-grid';
-  Object.keys(players).forEach(key=>{
-    const p=players[key];
-    const card=document.createElement('div'); card.className='card';
-    card.onclick=()=>showPlayer(key);
-    card.innerHTML=`<img src="${p.image||'assets/Lettre _W_ en noir et blanc.png'}">
-      <strong>${p.fullname}</strong><br>${p.pseudo||''}`;
-    grid.appendChild(card);
-  });
-  // Carte Ajouter
-  const addCard = document.createElement('div'); addCard.className='card add-card'; addCard.innerHTML='+'; addCard.onclick=openAdd;
-  grid.appendChild(addCard);
   container.appendChild(grid);
+  renderCards();
+
+  function renderCards(){
+    const q=searchInput.value.trim().toLowerCase();
+    grid.innerHTML='';
+    Object.keys(players).filter(k=>k.toLowerCase().includes(q)||players[k].pseudo.toLowerCase().includes(q)).forEach(key=>{
+      const p=players[key];
+      const card=document.createElement('div'); card.className='card';
+      card.onclick=()=>showPlayer(key);
+      card.innerHTML=`<img src="${p.image||'assets/Lettre _W_ en noir et blanc.png'}"><strong>${p.fullname}</strong><br>${p.pseudo||''}`;
+      grid.appendChild(card);
+    });
+    const addCard = document.createElement('div'); addCard.className='card add-card'; addCard.innerHTML='+'; addCard.onclick=openAdd;
+    grid.appendChild(addCard);
+  }
 }
 
 // --- Ajouter un joueur
@@ -177,7 +192,7 @@ function showPlayer(key){
   <div class="flags">${powersHtml}</div>
   ${careerHtml}
   <div><strong>Totaux :</strong> ${p.totals.matches} matchs — ${p.totals.goals} buts</div>
-  <div style="margin-top:12px;"><button onclick="openEdit('${key}')">Modifier</button> <button onclick="showMenu()">Retour</button></div>`;
+  <div style="margin-top:12px;"><button class="action-btn" onclick="openEdit('${key}')">Modifier</button> <button class="action-btn" onclick="showMenu()">Retour</button></div>`;
   container.appendChild(div);
 }
 
