@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Wokipédia — Encyclopédie des joueurs fictifs</title>
-  <!-- Icône d’onglet -->
-  <link rel="icon" type="image/png" href="assets/Lettre _W_ en noir et blanc.png">
+  <link rel="icon" type="image/png" href="w-icon.png"> <!-- Icône d'onglet -->
 
   <style>
     :root{--bg:#fff;--muted:#6b6b6b;--accent:#1765c1;--card:#fbfdff}
@@ -51,7 +50,7 @@
     <aside class="sidebar">
       <h3>Joueurs</h3>
       <ul id="list" class="player-list" role="listbox" tabindex="0"></ul>
-      <div class="muted" style="margin-top:12px">Clique sur un joueur pour voir sa page. Tu peux ajouter et modifier des fiches.</div>
+      <div class="muted" style="margin-top:12px">Clique sur un joueur pour voir sa page. Tes fiches sont sauvegardées dans ton navigateur.</div>
     </aside>
 
     <section class="content" id="detail">
@@ -70,8 +69,13 @@
         <label>Lieu de naissance</label><input id="birth">
         <label>Nationalités (séparées par des virgules)</label><input id="nats">
         <label>Poste</label><input id="pos">
-        <label>Carrière (format CSV: période|club|matchs|buts)</label>
-        <textarea id="career" rows="4"></textarea>
+
+        <label>Carrière</label>
+        <div id="careerBox">
+          <div id="careerList"></div>
+          <button type="button" onclick="addCareerRow()">+ Ajouter une étape</button>
+        </div>
+
         <label>Image</label>
         <input type="file" id="uploadImg" accept="image/*">
         <img id="preview" style="max-width:120px;margin-top:8px;display:block">
@@ -85,7 +89,7 @@
   </div>
 
   <script>
-    // Données initiales
+    // --- Données initiales
     const players = {
       "Palinho":{
         fullname:"Agani Parkson",
@@ -98,29 +102,21 @@
         career:[
           ["2009–2010","Southampton","22","7"],
           ["2010–2014","Hull City","61","20"],
-          ["2011–2012","→ Manchester United (prêt)","15","5"],
-          ["2012–2013","→ Corinthians (prêt)","27","12"],
-          ["2013–2014","→ Inter (prêt)","24","9"],
-          ["2014–2015","Fulham","30","11"],
-          ["2015–2020","Chelsea","71","26"],
-          ["2016–2018","→ Lecce (prêt)","59","23"],
-          ["2020–2022","Lecce","63","25"],
-          ["2022–2025","Frencia FC (Citronie)","92","41"]
+          ["2011–2012","→ Manchester United (prêt)","15","5"]
         ],
-        totals:{matches:484,goals:179}
+        totals:{matches:98,goals:32}
       }
     };
 
-    // Charger depuis localStorage
+    // --- Chargement depuis localStorage
     const saved = localStorage.getItem("wokipediaPlayers");
-    if (saved) {
-      Object.assign(players, JSON.parse(saved));
-    }
+    if (saved) Object.assign(players, JSON.parse(saved));
 
     function saveToStorage() {
       localStorage.setItem("wokipediaPlayers", JSON.stringify(players));
     }
 
+    // --- Affichage liste
     function renderList(){
       const q = document.getElementById('search').value.trim().toLowerCase();
       const list = document.getElementById('list');
@@ -136,6 +132,7 @@
       }
     }
 
+    // --- Affichage fiche joueur
     function showPlayer(key){
       const p = players[key];
       const container = document.getElementById('detail');
@@ -172,12 +169,61 @@
       container.appendChild(controls);
     }
 
+    // --- Formulaire carrière dynamique
+    function addCareerRow(data = {}) {
+      const row = document.createElement("div");
+      row.style.display = "grid";
+      row.style.gridTemplateColumns = "120px 1fr 80px 80px";
+      row.style.gap = "6px";
+      row.style.marginBottom = "4px";
+
+      const inputPeriod = document.createElement("input");
+      inputPeriod.placeholder = "2009–2010";
+      inputPeriod.value = data[0] || "";
+
+      const inputClub = document.createElement("input");
+      inputClub.placeholder = "Club (ex: !loan Chelsea)";
+      inputClub.value = data[1] || "";
+
+      const inputMatches = document.createElement("input");
+      inputMatches.type = "number";
+      inputMatches.placeholder = "Matchs";
+      inputMatches.value = data[2] || "";
+
+      const inputGoals = document.createElement("input");
+      inputGoals.type = "number";
+      inputGoals.placeholder = "Buts";
+      inputGoals.value = data[3] || "";
+
+      row.appendChild(inputPeriod);
+      row.appendChild(inputClub);
+      row.appendChild(inputMatches);
+      row.appendChild(inputGoals);
+
+      document.getElementById("careerList").appendChild(row);
+    }
+
+    function parseCareer() {
+      const rows = document.querySelectorAll("#careerList div");
+      return Array.from(rows).map(r => {
+        const [period, club, matches, goals] = [...r.querySelectorAll("input")].map(i=>i.value.trim());
+        return [
+          period,
+          club.startsWith("!loan") ? "→ " + club.replace("!loan","").trim() : club,
+          matches,
+          goals
+        ];
+      });
+    }
+
+    // --- Ouverture form
     function openAdd(){
       document.getElementById('formbox').style.display='flex';
       clearForm();
     }
     function openEdit(key){
       document.getElementById('formbox').style.display='flex';
+      clearForm();
       const p = players[key];
       document.getElementById('fn').value = p.fullname || '';
       document.getElementById('pn').value = key || '';
@@ -186,7 +232,7 @@
       document.getElementById('nats').value = (p.nats||[]).join(', ');
       document.getElementById('pos').value = p.pos || '';
       document.getElementById('preview').src = p.image || '';
-      document.getElementById('career').value = (p.career||[]).map(r=>r.join('|')).join('\n');
+      (p.career||[]).forEach(row=>addCareerRow(row));
     }
     function clearForm(){ 
       document.getElementById('fn').value='';
@@ -195,7 +241,7 @@
       document.getElementById('birth').value='';
       document.getElementById('nats').value='';
       document.getElementById('pos').value='';
-      document.getElementById('career').value='';
+      document.getElementById('careerList').innerHTML='';
       document.getElementById('preview').src='';
     }
     function closeForm(){ document.getElementById('formbox').style.display='none'; }
@@ -210,6 +256,7 @@
       }
     });
 
+    // --- Sauvegarde
     function savePlayer(){
       const key = document.getElementById('pn').value.trim();
       if(!key){ alert('Le pseudo est requis (ex: Palinho)'); return; }
@@ -221,7 +268,7 @@
         nats: document.getElementById('nats').value.split(',').map(s=>s.trim()).filter(Boolean),
         pos: document.getElementById('pos').value.trim(),
         image: document.getElementById('preview').src || '',
-        career: document.getElementById('career').value.split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(r=>r.length>=4),
+        career: parseCareer()
       };
       let matches=0, goals=0; 
       p.career.forEach(r=>{ matches+=parseInt(r[2])||0; goals+=parseInt(r[3])||0 });
@@ -231,6 +278,7 @@
       closeForm(); renderList(); showPlayer(key);
     }
 
+    // --- Initial render
     renderList();
   </script>
 </body>
