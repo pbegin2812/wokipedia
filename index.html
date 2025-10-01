@@ -1,42 +1,46 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Wokipédia — Encyclopédie des joueurs fictifs</title>
-  <link rel="icon" type="image/png" href="assets/Lettre _W_ en noir et blanc.png">
-  <style>
-    :root{--bg:#fff;--muted:#6b6b6b;--accent:#1765c1;--card:#fbfdff}
-    body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:#111}
-    header{background:#f4f7fb;padding:18px 24px;border-bottom:1px solid #e6eef9}
-    .wrap{max-width:1100px;margin:20px auto;padding:0 20px}
-    h1{margin:0;font-size:24px}
-    .searchbar{margin-top:12px;display:flex;gap:8px}
-    input[type=search]{flex:1;padding:10px 12px;border:1px solid #d9e4f5;border-radius:6px;font-size:15px}
-    button{padding:10px 12px;border-radius:6px;border:0;background:var(--accent);color:#fff;cursor:pointer}
-    .layout{display:grid;grid-template-columns:320px 1fr;gap:20px;margin-top:20px}
-    .sidebar{background:var(--card);padding:14px;border-radius:8px;border:1px solid #e9f0fb;max-height:80vh;overflow-y:auto}
-    .player-list{list-style:none;padding:0;margin:0}
-    .player-list li{padding:8px 6px;border-bottom:1px solid #f0f5fb;cursor:pointer}
-    .player-list li:hover{background:#f7fbff}
-    .content{background:#fff;padding:18px;border-radius:8px;border:1px solid #eef6ff;min-height:420px;max-height:70vh;overflow-y:auto}
-    .card-header{display:flex;gap:12px;align-items:center}
-    .avatar{width:96px;height:128px;background:#eee;border-radius:4px;overflow:hidden}
-    .avatar img{width:100%;height:100%;object-fit:cover}
-    .meta{flex:1}
-    table{border-collapse:collapse;width:100%;margin-top:12px}
-    td,th{padding:6px 8px;border:1px solid #f0f5fb}
-    .muted{color:var(--muted);font-size:14px}
-    .controls{display:flex;gap:8px;margin-top:12px}
-    .form{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff;max-height:50vh;overflow-y:auto}
-    label{display:block;font-size:13px;margin:6px 0 2px}
-    input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-radius:6px}
-    .flags{margin-top:4px;display:flex;gap:4px;flex-wrap:wrap}
-    .flag-btn{cursor:pointer;padding:2px 6px;border:1px solid #d9e4f5;border-radius:4px;background:#f7faff;color:#111;font-size:14px}
-    @media (max-width:900px){.layout{grid-template-columns:1fr}.sidebar{order:2}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wokipédia — Encyclopédie des joueurs fictifs</title>
+<link rel="icon" type="image/png" href="assets/Lettre _W_ en noir et blanc.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
+  body, input, button, select, textarea { font-family: 'Lexend', sans-serif; }
+  :root{--bg:#fff;--muted:#6b6b6b;--accent:#1765c1;--card:#fbfdff}
+  body{margin:0;background:var(--bg);color:#111}
+  header{background:#f4f7fb;padding:18px 24px;border-bottom:1px solid #e6eef9}
+  .wrap{max-width:1100px;margin:20px auto;padding:0 20px}
+  h1{margin:0;font-size:24px}
+  .searchbar{margin-top:12px;display:flex;gap:8px}
+  input[type=search]{flex:1;padding:10px 12px;border:1px solid #d9e4f5;border-radius:6px;font-size:15px}
+  button{padding:10px 12px;border-radius:6px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+  .layout{display:grid;grid-template-columns:320px 1fr;gap:20px;margin-top:20px}
+  .sidebar{background:var(--card);padding:14px;border-radius:8px;border:1px solid #e9f0fb;max-height:80vh;overflow-y:auto}
+  .player-list{list-style:none;padding:0;margin:0}
+  .player-list li{padding:8px 6px;border-bottom:1px solid #f0f5fb;cursor:pointer}
+  .player-list li:hover{background:#f7fbff}
+  .content{background:#fff;padding:18px;border-radius:8px;border:1px solid #eef6ff;min-height:420px;max-height:70vh;overflow-y:auto}
+  .card-header{display:flex;gap:12px;align-items:center}
+  .avatar{width:96px;height:128px;background:#eee;border-radius:4px;overflow:hidden}
+  .avatar img{width:100%;height:100%;object-fit:cover}
+  .meta{flex:1}
+  table{border-collapse:collapse;width:100%;margin-top:12px}
+  td,th{padding:6px 8px;border:1px solid #f0f5fb}
+  .muted{color:var(--muted);font-size:14px}
+  .controls{display:flex;gap:8px;margin-top:12px}
+  .form{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff;max-height:50vh;overflow-y:auto}
+  label{display:block;font-size:13px;margin:6px 0 2px}
+  input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-radius:6px}
+  .flags{margin-top:4px;display:flex;gap:4px;flex-wrap:wrap}
+  .flag-btn{cursor:pointer;padding:2px 6px;border:1px solid #d9e4f5;border-radius:4px;background:#f7faff;color:#111;font-size:14px}
+  @media (max-width:900px){.layout{grid-template-columns:1fr}.sidebar{order:2}}
+</style>
 </head>
 <body>
+
 <header>
   <div class="wrap">
     <h1>Wokipédia — Encyclopédie des joueurs fictifs</h1>
@@ -59,7 +63,6 @@
   </section>
 </div>
 
-<!-- Form modal -->
 <div id="formbox" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.45);align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;padding:16px;border-radius:10px;max-width:720px;width:100%">
     <h3>Ajouter / Modifier un joueur</h3>
@@ -70,9 +73,7 @@
       <label>Lieu de naissance</label><input id="birth">
       <label>Nationalités</label>
       <input id="nats" placeholder="Sépare les commandes par des virgules, ex: !france,!usa">
-      <div id="natButtons" style="margin-top:6px">
-        <!-- Boutons cliquables -->
-      </div>
+      <div id="natButtons" style="margin-top:6px"></div>
       <label>Poste</label><input id="pos">
 
       <label>Carrière</label>
@@ -106,7 +107,7 @@ const players = {
     career:[
       ["2009–2010","Southampton","22","7"],
       ["2010–2014","Hull City","61","20"],
-      ["2011–2012","→ Manchester United (prêt)","15","5"]
+      ["2011–2012","!loan Manchester United","15","5"]
     ],
     totals:{matches:98,goals:32}
   }
@@ -115,7 +116,6 @@ const saved = localStorage.getItem("wokipediaPlayers");
 if (saved) Object.assign(players, JSON.parse(saved));
 
 function saveToStorage(){ localStorage.setItem("wokipediaPlayers", JSON.stringify(players)); }
-
 function renderList(){
   const q = document.getElementById('search').value.trim().toLowerCase();
   const list = document.getElementById('list'); list.innerHTML='';
@@ -139,8 +139,11 @@ function showPlayer(key){
   const avatar = document.createElement('div'); avatar.className='avatar';
   const img = document.createElement('img'); img.src = p.image || ''; avatar.appendChild(img);
   const meta = document.createElement('div'); meta.className='meta';
+  // Affichage des drapeaux dans le profil
+  const natEmojis = p.nats.join(' ');
   meta.innerHTML = `<h2>${key} <span style="font-size:14px;color:#666">(${p.fullname})</span></h2>
-                    <div class="muted">${p.pos} • Né(e) ${p.dob} • ${p.birth}</div>`;
+                    <div class="muted">${p.pos} • Né(e) ${p.dob} • ${p.birth}</div>
+                    <div class="flags">${natEmojis}</div>`;
   header.appendChild(avatar); header.appendChild(meta); container.appendChild(header);
 
   const t = document.createElement('table');
@@ -148,12 +151,18 @@ function showPlayer(key){
   const tb = document.createElement('tbody');
   p.career.forEach(row=>{
     const tr = document.createElement('tr');
-    row.forEach(c=>{ const td=document.createElement('td'); td.textContent=c; tr.appendChild(td); });
-    const lastTd = tr.children[1];
-    const clubText = row[1].toLowerCase();
+    const period = row[0];
+    let club = row[1];
+    if(club.startsWith('!loan')) club = '→ ' + club.replace('!loan','').trim(); // !loan → flèche
+    const matches = row[2]; const goals = row[3];
+    [period, club, matches, goals].forEach(v=>{ const td=document.createElement('td'); td.textContent=v; tr.appendChild(td); });
+    // Ajouter les drapeaux si mention de commande
+    const clubLower = row[1].toLowerCase();
     const flagDiv = document.createElement('div'); flagDiv.className='flags';
-    Object.keys(flags).forEach(cmd=>{ if(clubText.includes(cmd)) flagDiv.appendChild(Object.assign(document.createElement('span'),{textContent:flags[cmd]})); });
-    if(flagDiv.children.length) lastTd.appendChild(flagDiv);
+    Object.keys(flags).forEach(cmd=>{
+      if(clubLower.includes(cmd)) flagDiv.appendChild(Object.assign(document.createElement('span'),{textContent:flags[cmd]}));
+    });
+    if(flagDiv.children.length) tr.children[1].appendChild(flagDiv);
     tb.appendChild(tr);
   });
   t.appendChild(tb); container.appendChild(t);
@@ -179,7 +188,7 @@ function addCareerRow(data = {}) {
 function parseCareer() {
   return Array.from(document.querySelectorAll("#careerList div")).map(r=>{
     const [period, club, matches, goals] = [...r.querySelectorAll("input")].map(i=>i.value.trim());
-    return [period, club.startsWith("!loan") ? "→ "+club.replace("!loan","").trim() : club, matches, goals];
+    return [period, club, matches, goals];
   });
 }
 
@@ -189,27 +198,15 @@ function openEdit(key){
   const p = players[key];
   document.getElementById('fn').value=p.fullname||''; document.getElementById('pn').value=key||'';
   document.getElementById('dob').value=p.dob||''; document.getElementById('birth').value=p.birth||'';
+  // Reconvertir drapeaux en commandes pour input
   document.getElementById('nats').value=(p.nats||[]).map(n=>Object.keys(flags).find(k=>flags[k]===n)||n).join(',');
   document.getElementById('pos').value=p.pos||''; document.getElementById('preview').src=p.image||'';
   (p.career||[]).forEach(row=>addCareerRow(row));
 }
-
-function clearForm(){ 
-  ['fn','pn','dob','birth','nats','pos'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('careerList').innerHTML=''; document.getElementById('preview').src='';
-}
-
+function clearForm(){ ['fn','pn','dob','birth','nats','pos'].forEach(id=>document.getElementById(id).value=''); document.getElementById('careerList').innerHTML=''; document.getElementById('preview').src=''; }
 function closeForm(){document.getElementById('formbox').style.display='none';}
+document.getElementById('uploadImg').addEventListener('change', e=>{ const file=e.target.files[0]; if(file){const url=URL.createObjectURL(file); document.getElementById('preview').src=url; document.getElementById('preview').dataset.tempUrl=url;} });
 
-document.getElementById('uploadImg').addEventListener('change', e=>{
-  const file = e.target.files[0]; if(file){
-    const url = URL.createObjectURL(file);
-    document.getElementById('preview').src=url;
-    document.getElementById('preview').dataset.tempUrl=url;
-  }
-});
-
-// Ajouter boutons pour nationalités
 const natButtons = document.getElementById('natButtons');
 Object.keys(flags).forEach(cmd=>{
   const btn = document.createElement('button'); btn.className='flag-btn'; btn.textContent=flags[cmd];
@@ -222,8 +219,7 @@ Object.keys(flags).forEach(cmd=>{
 });
 
 function savePlayer(){
-  const key = document.getElementById('pn').value.trim();
-  if(!key){ alert('Le pseudo est requis'); return; }
+  const key = document.getElementById('pn').value.trim(); if(!key){ alert('Le pseudo est requis'); return; }
   const natsInput = document.getElementById('nats').value.split(',').map(s=>s.trim()).filter(Boolean);
   const nats = natsInput.map(n=>flags[n.toLowerCase()]||n);
   const p = {
