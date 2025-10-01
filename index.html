@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wokipédia — Encyclopédie des joueurs fictifs</title>
-<link rel="icon" type="image/png" href="assets/Lettre _W_ en noir et blanc.png">
+<link rel="icon" type="image/png" href="assets/wokipédia.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 
@@ -129,7 +129,7 @@ const players = {
   }
 };
 
-// --- Commandes pays (exemples)
+// --- Commandes pays / drapeaux
 const countryCommands = {"!france":"France","!usa":"USA","!uk":"Royaume-Uni","!brazil":"Brésil","!spain":"Espagne"};
 function getFlagSrc(name){ return `assets/${name}.png`; }
 
@@ -157,43 +157,112 @@ function renderList(){
 
 // --- Affichage profil joueur
 function showPlayer(key){
-  const p = players[key]; const container = document.getElementById('detail'); container.innerHTML='';
-  const header = document.createElement('div'); header.className='card-header';
-  const avatar = document.createElement('div'); avatar.className='avatar';
-  const img = document.createElement('img'); img.src=p.image||''; avatar.appendChild(img);
-  const meta = document.createElement('div'); meta.className='meta';
+  const p = players[key]; 
+  const container = document.getElementById('detail'); 
+  container.innerHTML='';
 
-  const flagDiv = document.createElement('div'); flagDiv.className='flags';
-  (p.powers||[]).forEach(c=>{
-    if(countryCommands[c.toLowerCase()]){ 
-      const f = document.createElement('img'); f.src=getFlagSrc(countryCommands[c.toLowerCase()]); f.style.width='20px'; f.style.height='14px'; f.alt=c;
-      flagDiv.appendChild(f);
-    }
-  });
+  const header = document.createElement('div'); 
+  header.className='card-header';
+
+  const avatar = document.createElement('div'); 
+  avatar.className='avatar';
+  const img = document.createElement('img'); 
+  img.src=p.image||''; 
+  avatar.appendChild(img);
+
+  const meta = document.createElement('div'); 
+  meta.className='meta';
   meta.innerHTML=`<h2>${key} <span style="font-size:14px;color:#666">(${p.fullname})</span></h2>
                    <div class="muted">${p.pos} • Né(e) ${p.dob} • ${p.birth}</div>`;
-  meta.appendChild(flagDiv);
-  header.appendChild(avatar); header.appendChild(meta); container.appendChild(header);
+  header.appendChild(avatar); 
+  header.appendChild(meta); 
+  container.appendChild(header);
 
+  // --- Section des drapeaux/noms sous infos du joueur
+  const powersDiv = document.createElement('div'); 
+  powersDiv.id = 'playerPowers'; 
+  powersDiv.className = 'flags';
+  powersDiv.style.marginTop = '8px';
+  container.appendChild(powersDiv);
+
+  // Ajouter chaque pouvoir/nationalité
+  (p.powers||[]).forEach(c=>{
+    addPowerToProfile(c,powersDiv);
+  });
+
+  // --- Carrière
   const t = document.createElement('table');
   t.innerHTML='<thead><tr><th>Période</th><th>Club</th><th>Matchs</th><th>Buts</th></tr></thead>';
-  const tb=document.createElement('tbody');
+  const tb = document.createElement('tbody');
   (p.career||[]).forEach(row=>{
     const tr=document.createElement('tr');
     let club=row[1].startsWith('!loan') ? '→ '+row[1].replace('!loan','').trim() : row[1];
     [row[0],club,row[2],row[3]].forEach(v=>{const td=document.createElement('td'); td.textContent=v; tr.appendChild(td);});
     tb.appendChild(tr);
   });
-  t.appendChild(tb); container.appendChild(t);
+  t.appendChild(tb); 
+  container.appendChild(t);
 
-  const tot=document.createElement('div'); tot.style.marginTop='12px';
+  const tot = document.createElement('div'); 
+  tot.style.marginTop='12px';
   tot.innerHTML=`<strong>Totaux :</strong> ${p.totals.matches} matchs — ${p.totals.goals} buts`;
   container.appendChild(tot);
 
-  const controls=document.createElement('div'); controls.className='controls';
-  const btnEdit=document.createElement('button'); btnEdit.textContent='Modifier'; btnEdit.onclick=()=>openEdit(key);
-  controls.appendChild(btnEdit); container.appendChild(controls);
+  const controls = document.createElement('div'); 
+  controls.className='controls';
+  const btnEdit = document.createElement('button'); 
+  btnEdit.textContent='Modifier'; 
+  btnEdit.onclick = ()=>openEdit(key);
+  controls.appendChild(btnEdit); 
+  container.appendChild(controls);
 }
+
+// --- Ajouter un pouvoir/nationalité à l'affichage du profil
+function addPowerToProfile(name, container){
+  const div = document.createElement('div');
+  div.style.display = 'flex'; 
+  div.style.alignItems = 'center'; 
+  div.style.gap = '4px'; 
+  div.style.padding = '2px 6px'; 
+  div.style.border = '1px solid #d0e0ff'; 
+  div.style.borderRadius = '4px'; 
+  div.style.marginRight = '4px';
+  
+  const img = document.createElement('img');
+  img.src = `assets/${name}.png`; 
+  img.alt = name; 
+  img.style.width='20px'; 
+  img.style.height='14px';
+  
+  const span = document.createElement('span'); 
+  span.textContent = name;
+  
+  div.appendChild(img); 
+  div.appendChild(span);
+  container.appendChild(div);
+}
+
+// --- Ajouter un pouvoir/nationalité via formulaire
+function addPower(val){
+  val = val || document.getElementById('powerInput').value.trim(); 
+  if(!val) return;
+  const list = document.getElementById('powerList'); 
+  const div = document.createElement('div');
+  const span = document.createElement('span'); span.textContent = val;
+  const note = document.createElement('input'); note.type="number"; note.min="0"; note.max="10"; note.placeholder="note"; note.style.width="40px";
+  const btn = document.createElement('button'); btn.textContent="×"; btn.style.border="none"; btn.style.background="transparent"; btn.style.cursor="pointer"; 
+  btn.onclick=()=>list.removeChild(div);
+  div.append(span,note,btn); 
+  list.appendChild(div); 
+  document.getElementById('powerInput').value="";
+  
+  const profileDiv = document.getElementById('playerPowers');
+  if(profileDiv) addPowerToProfile(val, profileDiv);
+}
+
+// --- Autocomplete
+document.querySelector('button[onclick="addPower()"]').addEventListener('click',()=>addPower());
+document.getElementById('powerInput').addEventListener('input',()=>{ const val=document.getElementById('powerInput').value.toLowerCase(); const s=powers.find(p=>p.toLowerCase().startsWith(val)); if(s) document.getElementById('powerInput').value=s;});
 
 // --- Carrière dynamique
 function addCareerRow(data={}){const row=document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr 80px 80px"; row.style.gap="6px"; row.style.marginBottom="4px";
@@ -201,46 +270,32 @@ const inputPeriod=document.createElement("input"); inputPeriod.placeholder="2009
 const inputClub=document.createElement("input"); inputClub.placeholder="Club (ex: !loan Chelsea)"; inputClub.value=data[1]||"";
 const inputMatches=document.createElement("input"); inputMatches.type="number"; inputMatches.placeholder="Matchs"; inputMatches.value=data[2]||"";
 const inputGoals=document.createElement("input"); inputGoals.type="number"; inputGoals.placeholder="Buts"; inputGoals.value=data[3]||"";
-row.append(inputPeriod,inputClub,inputMatches,inputGoals); document.getElementById("careerList").appendChild(row);}
-function parseCareer(){return Array.from(document.querySelectorAll("#careerList div")).map(r=>[...r.querySelectorAll("input")].map(i=>i.value.trim()));}
-
-// --- Pouvoirs / nationalités
-function addPower(val){val=val||document.getElementById('powerInput').value.trim(); if(!val) return;
-const list=document.getElementById('powerList'); const div=document.createElement('div');
-const span=document.createElement('span'); span.textContent=val;
-const note=document.createElement('input'); note.type="number"; note.min="0"; note.max="10"; note.placeholder="note"; note.style.width="40px";
-const btn=document.createElement('button'); btn.textContent="×"; btn.style.border="none"; btn.style.background="transparent"; btn.style.cursor="pointer"; btn.onclick=()=>list.removeChild(div);
-div.append(span,note,btn); list.appendChild(div); document.getElementById('powerInput').value="";}
-document.querySelector('button[onclick="addPower()"]').addEventListener('click',()=>addPower());
-document.getElementById('powerInput').addEventListener('input',()=>{ const val=document.getElementById('powerInput').value.toLowerCase(); const s=powers.find(p=>p.toLowerCase().startsWith(val)); if(s) document.getElementById('powerInput').value=s;});
+row.appendChild(inputPeriod); row.appendChild(inputClub); row.appendChild(inputMatches); row.appendChild(inputGoals);
+document.getElementById("careerList").appendChild(row);}
+function parseCareer(){ const rows=document.querySelectorAll("#careerList div"); return Array.from(rows).map(r=>{ const [period,club,matches,goals]=[...r.querySelectorAll("input")].map(i=>i.value.trim()); return [period,club,matches,goals];});}
 
 // --- Formulaire
 function openAdd(){document.getElementById('formbox').style.display='flex'; clearForm();}
 function openEdit(key){document.getElementById('formbox').style.display='flex'; clearForm();
-const p=players[key]; document.getElementById('fn').value=p.fullname||''; document.getElementById('pn').value=key||'';
-document.getElementById('dob').value=p.dob||''; document.getElementById('birth').value=p.birth||'';
-document.getElementById('pos').value=p.pos||''; document.getElementById('preview').src=p.image||'';
-(p.career||[]).forEach(row=>addCareerRow(row));
-(p.powers||[]).forEach(pow=>addPower(pow));}
-function clearForm(){['fn','pn','dob','birth','pos'].forEach(id=>document.getElementById(id).value=''); document.getElementById('careerList').innerHTML=''; document.getElementById('powerList').innerHTML=''; document.getElementById('preview').src=''; document.getElementById('fileName').textContent='';}
+const p = players[key]; document.getElementById('fn').value=p.fullname||''; document.getElementById('pn').value=key||''; document.getElementById('dob').value=p.dob||''; document.getElementById('birth').value=p.birth||''; document.getElementById('pos').value=p.pos||''; document.getElementById('preview').src=p.image||'';
+(p.career||[]).forEach(row=>addCareerRow(row)); (p.powers||[]).forEach(c=>addPower(c));}
+function clearForm(){['fn','pn','dob','birth','pos','powerInput'].forEach(id=>document.getElementById(id).value=''); document.getElementById('careerList').innerHTML=''; document.getElementById('powerList').innerHTML=''; document.getElementById('preview').src='';}
 function closeForm(){document.getElementById('formbox').style.display='none';}
 
 // --- Upload image
 document.getElementById('uploadBtn').addEventListener('click',()=>document.getElementById('uploadImg').click());
-document.getElementById('uploadImg').addEventListener('change', e=>{const file=e.target.files[0]; if(file){document.getElementById('fileName').textContent=file.name; const url=URL.createObjectURL(file); document.getElementById('preview').src=url; document.getElementById('preview').dataset.tempUrl=url;}});
+document.getElementById('uploadImg').addEventListener('change', e => { const file=e.target.files[0]; if(file){ const url=URL.createObjectURL(file); document.getElementById('preview').src=url; document.getElementById('fileName').textContent=file.name; } });
 
 // --- Sauvegarde
 function savePlayer(){
-  const key=document.getElementById('pn').value.trim(); if(!key){alert('Pseudo requis'); return;}
-  const powersArr=Array.from(document.querySelectorAll('#powerList div span')).map(s=>s.textContent);
-  const p={fullname:document.getElementById('fn').value.trim(),pseudo:key,dob:document.getElementById('dob').value.trim(),birth:document.getElementById('birth').value.trim(),powers:powersArr,pos:document.getElementById('pos').value.trim(),image:document.getElementById('preview').src||'',career:parseCareer()};
-  let matches=0,goals=0; p.career.forEach(r=>{matches+=parseInt(r[2])||0;goals+=parseInt(r[3])||0;}); p.totals={matches,goals};
-  players[key]=p; saveToStorage(); closeForm(); renderList(); showPlayer(key);
+  const key=document.getElementById('pn').value.trim(); if(!key){alert('Le pseudo est requis'); return;}
+  const p={ fullname:document.getElementById('fn').value.trim(), pseudo:key, dob:document.getElementById('dob').value.trim(), birth:document.getElementById('birth').value.trim(), pos:document.getElementById('pos').value.trim(), image:document.getElementById('preview').src||'', career:parseCareer(), powers:Array.from(document.querySelectorAll('#powerList span')).map(s=>s.textContent) };
+  let matches=0, goals=0; p.career.forEach(r=>{matches+=parseInt(r[2])||0; goals+=parseInt(r[3])||0;}); p.totals={matches,goals}; players[key]=p;
+  saveToStorage(); closeForm(); renderList(); showPlayer(key);
 }
 
 // --- Initial render
 renderList();
 </script>
-
 </body>
 </html>
