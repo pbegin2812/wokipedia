@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Wokipédia — Encyclopédie des joueurs fictifs</title>
-  <link rel="icon" type="image/png" href="w-icon.png"> <!-- Icône d'onglet -->
-
+  <link rel="icon" type="image/png" href="assets/Lettre _W_ en noir et blanc.png">
   <style>
     :root{--bg:#fff;--muted:#6b6b6b;--accent:#1765c1;--card:#fbfdff}
     body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:#111}
@@ -16,11 +15,11 @@
     input[type=search]{flex:1;padding:10px 12px;border:1px solid #d9e4f5;border-radius:6px;font-size:15px}
     button{padding:10px 12px;border-radius:6px;border:0;background:var(--accent);color:#fff;cursor:pointer}
     .layout{display:grid;grid-template-columns:320px 1fr;gap:20px;margin-top:20px}
-    .sidebar{background:var(--card);padding:14px;border-radius:8px;border:1px solid #e9f0fb}
+    .sidebar{background:var(--card);padding:14px;border-radius:8px;border:1px solid #e9f0fb;max-height:80vh;overflow-y:auto}
     .player-list{list-style:none;padding:0;margin:0}
     .player-list li{padding:8px 6px;border-bottom:1px solid #f0f5fb;cursor:pointer}
     .player-list li:hover{background:#f7fbff}
-    .content{background:#fff;padding:18px;border-radius:8px;border:1px solid #eef6ff;min-height:420px}
+    .content{background:#fff;padding:18px;border-radius:8px;border:1px solid #eef6ff;min-height:420px;max-height:70vh;overflow-y:auto}
     .card-header{display:flex;gap:12px;align-items:center}
     .avatar{width:96px;height:128px;background:#eee;border-radius:4px;overflow:hidden}
     .avatar img{width:100%;height:100%;object-fit:cover}
@@ -29,257 +28,220 @@
     td,th{padding:6px 8px;border:1px solid #f0f5fb}
     .muted{color:var(--muted);font-size:14px}
     .controls{display:flex;gap:8px;margin-top:12px}
-    .form{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff}
+    .form{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff;max-height:50vh;overflow-y:auto}
     label{display:block;font-size:13px;margin:6px 0 2px}
     input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-radius:6px}
+    .flags{margin-top:4px;display:flex;gap:4px;flex-wrap:wrap}
+    .flag-btn{cursor:pointer;padding:2px 6px;border:1px solid #d9e4f5;border-radius:4px;background:#f7faff;color:#111;font-size:14px}
     @media (max-width:900px){.layout{grid-template-columns:1fr}.sidebar{order:2}}
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <h1>Wokipédia — Encyclopédie des joueurs fictifs</h1>
-      <div class="searchbar">
-        <input id="search" type="search" placeholder="Rechercher un joueur (ex : Palinho, Parkson)..." oninput="renderList()">
-        <button onclick="openAdd()">Ajouter un joueur</button>
-      </div>
-    </div>
-  </header>
-
-  <div class="wrap layout">
-    <aside class="sidebar">
-      <h3>Joueurs</h3>
-      <ul id="list" class="player-list" role="listbox" tabindex="0"></ul>
-      <div class="muted" style="margin-top:12px">Clique sur un joueur pour voir sa page. Tes fiches sont sauvegardées dans ton navigateur.</div>
-    </aside>
-
-    <section class="content" id="detail">
-      <div class="muted">Sélectionne un joueur dans la colonne de gauche ou recherche par nom.</div>
-    </section>
-  </div>
-
-  <!-- Form modal -->
-  <div id="formbox" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.45);align-items:center;justify-content:center;padding:20px">
-    <div style="background:#fff;padding:16px;border-radius:10px;max-width:720px;width:100%">
-      <h3>Ajouter / Modifier un joueur</h3>
-      <div class="form">
-        <label>Nom complet</label><input id="fn">
-        <label>Pseudo</label><input id="pn">
-        <label>Date de naissance</label><input id="dob" placeholder="JJ/MM/AAAA">
-        <label>Lieu de naissance</label><input id="birth">
-        <label>Nationalités (séparées par des virgules)</label><input id="nats">
-        <label>Poste</label><input id="pos">
-
-        <label>Carrière</label>
-        <div id="careerBox">
-          <div id="careerList"></div>
-          <button type="button" onclick="addCareerRow()">+ Ajouter une étape</button>
-        </div>
-
-        <label>Image</label>
-        <input type="file" id="uploadImg" accept="image/*">
-        <img id="preview" style="max-width:120px;margin-top:8px;display:block">
-
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button onclick="savePlayer()">Enregistrer</button>
-          <button onclick="closeForm()" style="background:#eee;color:#111">Annuler</button>
-        </div>
-      </div>
+<header>
+  <div class="wrap">
+    <h1>Wokipédia — Encyclopédie des joueurs fictifs</h1>
+    <div class="searchbar">
+      <input id="search" type="search" placeholder="Rechercher un joueur..." oninput="renderList()">
+      <button onclick="openAdd()">Ajouter un joueur</button>
     </div>
   </div>
+</header>
 
-  <script>
-    // --- Données initiales
-    const players = {
-      "Palinho":{
-        fullname:"Agani Parkson",
-        pseudo:"Palinho",
-        dob:"30/07/1992",
-        birth:"London, England",
-        nats:["Philippines","United Kingdom","United States","Oman","Brazil","Spain (2014)"],
-        pos:"Attaquant",
-        image:"",
-        career:[
-          ["2009–2010","Southampton","22","7"],
-          ["2010–2014","Hull City","61","20"],
-          ["2011–2012","→ Manchester United (prêt)","15","5"]
-        ],
-        totals:{matches:98,goals:32}
-      }
-    };
+<div class="wrap layout">
+  <aside class="sidebar">
+    <h3>Joueurs</h3>
+    <ul id="list" class="player-list" role="listbox" tabindex="0"></ul>
+    <div class="muted" style="margin-top:12px">Clique sur un joueur pour voir sa page. Tes fiches sont sauvegardées dans ton navigateur.</div>
+  </aside>
 
-    // --- Chargement depuis localStorage
-    const saved = localStorage.getItem("wokipediaPlayers");
-    if (saved) Object.assign(players, JSON.parse(saved));
+  <section class="content" id="detail">
+    <div class="muted">Sélectionne un joueur dans la colonne de gauche ou recherche par nom.</div>
+  </section>
+</div>
 
-    function saveToStorage() {
-      localStorage.setItem("wokipediaPlayers", JSON.stringify(players));
-    }
+<!-- Form modal -->
+<div id="formbox" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.45);align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;padding:16px;border-radius:10px;max-width:720px;width:100%">
+    <h3>Ajouter / Modifier un joueur</h3>
+    <div class="form">
+      <label>Nom complet</label><input id="fn">
+      <label>Pseudo</label><input id="pn">
+      <label>Date de naissance</label><input id="dob" placeholder="JJ/MM/AAAA">
+      <label>Lieu de naissance</label><input id="birth">
+      <label>Nationalités</label>
+      <input id="nats" placeholder="Sépare les commandes par des virgules, ex: !france,!usa">
+      <div id="natButtons" style="margin-top:6px">
+        <!-- Boutons cliquables -->
+      </div>
+      <label>Poste</label><input id="pos">
 
-    // --- Affichage liste
-    function renderList(){
-      const q = document.getElementById('search').value.trim().toLowerCase();
-      const list = document.getElementById('list');
-      list.innerHTML = '';
-      Object.keys(players).filter(k=>k.toLowerCase().includes(q) || players[k].fullname.toLowerCase().includes(q)).sort().forEach(name=>{
-        const li = document.createElement('li');
-        li.textContent = name + ' — ' + (players[name].pseudo||'');
-        li.onclick = ()=>showPlayer(name);
-        list.appendChild(li);
-      });
-      if(list.children.length===0){
-        const li = document.createElement('li'); li.textContent='Aucun joueur trouvé'; li.style.color='#888'; list.appendChild(li);
-      }
-    }
+      <label>Carrière</label>
+      <div id="careerBox">
+        <div id="careerList"></div>
+        <button type="button" onclick="addCareerRow()">+ Ajouter une étape</button>
+      </div>
 
-    // --- Affichage fiche joueur
-    function showPlayer(key){
-      const p = players[key];
-      const container = document.getElementById('detail');
-      container.innerHTML = '';
-      const header = document.createElement('div'); header.className='card-header';
-      const avatar = document.createElement('div'); avatar.className='avatar';
-      const img = document.createElement('img'); img.src = p.image || '';
-      avatar.appendChild(img);
-      const meta = document.createElement('div'); meta.className='meta';
-      meta.innerHTML = `<h2>${key} <span style="font-size:14px;color:#666">(${p.fullname})</span></h2>
-                        <div class="muted">${p.pos} • Né(e) ${p.dob} • ${p.birth}</div>`;
-      header.appendChild(avatar); header.appendChild(meta);
-      container.appendChild(header);
+      <label>Image</label>
+      <input type="file" id="uploadImg" accept="image/*">
+      <img id="preview" style="max-width:120px;margin-top:8px;display:block">
 
-      const t = document.createElement('table');
-      t.innerHTML = '<thead><tr><th>Période</th><th>Club</th><th>Matchs</th><th>Buts</th></tr></thead>';
-      const tb = document.createElement('tbody');
-      p.career.forEach(row=>{
-        const tr = document.createElement('tr');
-        row.forEach(c=>{ const td=document.createElement('td'); td.textContent=c; tr.appendChild(td); });
-        tb.appendChild(tr);
-      });
-      t.appendChild(tb);
-      container.appendChild(t);
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="savePlayer()">Enregistrer</button>
+        <button onclick="closeForm()" style="background:#eee;color:#111">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-      const tot = document.createElement('div'); 
-      tot.style.marginTop='12px'; 
-      tot.innerHTML=`<strong>Totaux :</strong> ${p.totals.matches} matchs — ${p.totals.goals} buts`;
-      container.appendChild(tot);
+<script>
+const players = {
+  "Palinho":{
+    fullname:"Agani Parkson",
+    pseudo:"Palinho",
+    dob:"30/07/1992",
+    birth:"London, England",
+    nats:["🇵🇭","🇬🇧","🇺🇸","🇴🇲","🇧🇷","🇪🇸"],
+    pos:"Attaquant",
+    image:"",
+    career:[
+      ["2009–2010","Southampton","22","7"],
+      ["2010–2014","Hull City","61","20"],
+      ["2011–2012","→ Manchester United (prêt)","15","5"]
+    ],
+    totals:{matches:98,goals:32}
+  }
+};
+const saved = localStorage.getItem("wokipediaPlayers");
+if (saved) Object.assign(players, JSON.parse(saved));
 
-      const controls = document.createElement('div'); controls.className='controls';
-      const btnEdit = document.createElement('button'); btnEdit.textContent='Modifier'; btnEdit.onclick=()=>openEdit(key);
-      controls.appendChild(btnEdit);
-      container.appendChild(controls);
-    }
+function saveToStorage(){ localStorage.setItem("wokipediaPlayers", JSON.stringify(players)); }
 
-    // --- Formulaire carrière dynamique
-    function addCareerRow(data = {}) {
-      const row = document.createElement("div");
-      row.style.display = "grid";
-      row.style.gridTemplateColumns = "120px 1fr 80px 80px";
-      row.style.gap = "6px";
-      row.style.marginBottom = "4px";
-
-      const inputPeriod = document.createElement("input");
-      inputPeriod.placeholder = "2009–2010";
-      inputPeriod.value = data[0] || "";
-
-      const inputClub = document.createElement("input");
-      inputClub.placeholder = "Club (ex: !loan Chelsea)";
-      inputClub.value = data[1] || "";
-
-      const inputMatches = document.createElement("input");
-      inputMatches.type = "number";
-      inputMatches.placeholder = "Matchs";
-      inputMatches.value = data[2] || "";
-
-      const inputGoals = document.createElement("input");
-      inputGoals.type = "number";
-      inputGoals.placeholder = "Buts";
-      inputGoals.value = data[3] || "";
-
-      row.appendChild(inputPeriod);
-      row.appendChild(inputClub);
-      row.appendChild(inputMatches);
-      row.appendChild(inputGoals);
-
-      document.getElementById("careerList").appendChild(row);
-    }
-
-    function parseCareer() {
-      const rows = document.querySelectorAll("#careerList div");
-      return Array.from(rows).map(r => {
-        const [period, club, matches, goals] = [...r.querySelectorAll("input")].map(i=>i.value.trim());
-        return [
-          period,
-          club.startsWith("!loan") ? "→ " + club.replace("!loan","").trim() : club,
-          matches,
-          goals
-        ];
-      });
-    }
-
-    // --- Ouverture form
-    function openAdd(){
-      document.getElementById('formbox').style.display='flex';
-      clearForm();
-    }
-    function openEdit(key){
-      document.getElementById('formbox').style.display='flex';
-      clearForm();
-      const p = players[key];
-      document.getElementById('fn').value = p.fullname || '';
-      document.getElementById('pn').value = key || '';
-      document.getElementById('dob').value = p.dob || '';
-      document.getElementById('birth').value = p.birth || '';
-      document.getElementById('nats').value = (p.nats||[]).join(', ');
-      document.getElementById('pos').value = p.pos || '';
-      document.getElementById('preview').src = p.image || '';
-      (p.career||[]).forEach(row=>addCareerRow(row));
-    }
-    function clearForm(){ 
-      document.getElementById('fn').value='';
-      document.getElementById('pn').value='';
-      document.getElementById('dob').value='';
-      document.getElementById('birth').value='';
-      document.getElementById('nats').value='';
-      document.getElementById('pos').value='';
-      document.getElementById('careerList').innerHTML='';
-      document.getElementById('preview').src='';
-    }
-    function closeForm(){ document.getElementById('formbox').style.display='none'; }
-
-    // Upload preview
-    document.getElementById('uploadImg').addEventListener('change', e => {
-      const file = e.target.files[0];
-      if(file){
-        const url = URL.createObjectURL(file);
-        document.getElementById('preview').src = url;
-        document.getElementById('preview').dataset.tempUrl = url;
-      }
+function renderList(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const list = document.getElementById('list'); list.innerHTML='';
+  Object.keys(players).filter(k=>k.toLowerCase().includes(q) || players[k].fullname.toLowerCase().includes(q)).sort()
+    .forEach(name=>{
+      const li = document.createElement('li');
+      li.textContent = name + ' — ' + (players[name].pseudo||'');
+      li.onclick = ()=>showPlayer(name);
+      list.appendChild(li);
     });
+  if(list.children.length===0){ const li = document.createElement('li'); li.textContent='Aucun joueur trouvé'; li.style.color='#888'; list.appendChild(li); }
+}
 
-    // --- Sauvegarde
-    function savePlayer(){
-      const key = document.getElementById('pn').value.trim();
-      if(!key){ alert('Le pseudo est requis (ex: Palinho)'); return; }
-      const p = {
-        fullname: document.getElementById('fn').value.trim(),
-        pseudo: key,
-        dob: document.getElementById('dob').value.trim(),
-        birth: document.getElementById('birth').value.trim(),
-        nats: document.getElementById('nats').value.split(',').map(s=>s.trim()).filter(Boolean),
-        pos: document.getElementById('pos').value.trim(),
-        image: document.getElementById('preview').src || '',
-        career: parseCareer()
-      };
-      let matches=0, goals=0; 
-      p.career.forEach(r=>{ matches+=parseInt(r[2])||0; goals+=parseInt(r[3])||0 });
-      p.totals={matches,goals};
-      players[key]=p;
-      saveToStorage();
-      closeForm(); renderList(); showPlayer(key);
-    }
+const flags = {
+  "!usa":"🇺🇸","!france":"🇫🇷","!uk":"🇬🇧","!brazil":"🇧🇷","!spain":"🇪🇸","!philippines":"🇵🇭","!oman":"🇴🇲"
+};
 
-    // --- Initial render
-    renderList();
-  </script>
+function showPlayer(key){
+  const p = players[key]; const container = document.getElementById('detail'); container.innerHTML='';
+  const header = document.createElement('div'); header.className='card-header';
+  const avatar = document.createElement('div'); avatar.className='avatar';
+  const img = document.createElement('img'); img.src = p.image || ''; avatar.appendChild(img);
+  const meta = document.createElement('div'); meta.className='meta';
+  meta.innerHTML = `<h2>${key} <span style="font-size:14px;color:#666">(${p.fullname})</span></h2>
+                    <div class="muted">${p.pos} • Né(e) ${p.dob} • ${p.birth}</div>`;
+  header.appendChild(avatar); header.appendChild(meta); container.appendChild(header);
+
+  const t = document.createElement('table');
+  t.innerHTML = '<thead><tr><th>Période</th><th>Club</th><th>Matchs</th><th>Buts</th></tr></thead>';
+  const tb = document.createElement('tbody');
+  p.career.forEach(row=>{
+    const tr = document.createElement('tr');
+    row.forEach(c=>{ const td=document.createElement('td'); td.textContent=c; tr.appendChild(td); });
+    const lastTd = tr.children[1];
+    const clubText = row[1].toLowerCase();
+    const flagDiv = document.createElement('div'); flagDiv.className='flags';
+    Object.keys(flags).forEach(cmd=>{ if(clubText.includes(cmd)) flagDiv.appendChild(Object.assign(document.createElement('span'),{textContent:flags[cmd]})); });
+    if(flagDiv.children.length) lastTd.appendChild(flagDiv);
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb); container.appendChild(t);
+
+  const tot = document.createElement('div'); tot.style.marginTop='12px';
+  tot.innerHTML=`<strong>Totaux :</strong> ${p.totals.matches} matchs — ${p.totals.goals} buts`;
+  container.appendChild(tot);
+
+  const controls = document.createElement('div'); controls.className='controls';
+  const btnEdit = document.createElement('button'); btnEdit.textContent='Modifier'; btnEdit.onclick=()=>openEdit(key);
+  controls.appendChild(btnEdit); container.appendChild(controls);
+}
+
+function addCareerRow(data = {}) {
+  const row = document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr 80px 80px"; row.style.gap="6px"; row.style.marginBottom="4px";
+  const inputPeriod=document.createElement("input"); inputPeriod.placeholder="2009–2010"; inputPeriod.value=data[0]||"";
+  const inputClub=document.createElement("input"); inputClub.placeholder="Club (ex: !loan Chelsea)"; inputClub.value=data[1]||"";
+  const inputMatches=document.createElement("input"); inputMatches.type="number"; inputMatches.placeholder="Matchs"; inputMatches.value=data[2]||"";
+  const inputGoals=document.createElement("input"); inputGoals.type="number"; inputGoals.placeholder="Buts"; inputGoals.value=data[3]||"";
+  row.append(inputPeriod,inputClub,inputMatches,inputGoals);
+  document.getElementById("careerList").appendChild(row);
+}
+function parseCareer() {
+  return Array.from(document.querySelectorAll("#careerList div")).map(r=>{
+    const [period, club, matches, goals] = [...r.querySelectorAll("input")].map(i=>i.value.trim());
+    return [period, club.startsWith("!loan") ? "→ "+club.replace("!loan","").trim() : club, matches, goals];
+  });
+}
+
+function openAdd(){document.getElementById('formbox').style.display='flex'; clearForm();}
+function openEdit(key){
+  document.getElementById('formbox').style.display='flex'; clearForm();
+  const p = players[key];
+  document.getElementById('fn').value=p.fullname||''; document.getElementById('pn').value=key||'';
+  document.getElementById('dob').value=p.dob||''; document.getElementById('birth').value=p.birth||'';
+  document.getElementById('nats').value=(p.nats||[]).map(n=>Object.keys(flags).find(k=>flags[k]===n)||n).join(',');
+  document.getElementById('pos').value=p.pos||''; document.getElementById('preview').src=p.image||'';
+  (p.career||[]).forEach(row=>addCareerRow(row));
+}
+
+function clearForm(){ 
+  ['fn','pn','dob','birth','nats','pos'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('careerList').innerHTML=''; document.getElementById('preview').src='';
+}
+
+function closeForm(){document.getElementById('formbox').style.display='none';}
+
+document.getElementById('uploadImg').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(file){
+    const url = URL.createObjectURL(file);
+    document.getElementById('preview').src=url;
+    document.getElementById('preview').dataset.tempUrl=url;
+  }
+});
+
+// Ajouter boutons pour nationalités
+const natButtons = document.getElementById('natButtons');
+Object.keys(flags).forEach(cmd=>{
+  const btn = document.createElement('button'); btn.className='flag-btn'; btn.textContent=flags[cmd];
+  btn.onclick = ()=> {
+    const input = document.getElementById('nats');
+    const arr = input.value.split(',').map(s=>s.trim()).filter(Boolean);
+    if(!arr.includes(cmd)) arr.push(cmd); input.value=arr.join(',');
+  };
+  natButtons.appendChild(btn);
+});
+
+function savePlayer(){
+  const key = document.getElementById('pn').value.trim();
+  if(!key){ alert('Le pseudo est requis'); return; }
+  const natsInput = document.getElementById('nats').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const nats = natsInput.map(n=>flags[n.toLowerCase()]||n);
+  const p = {
+    fullname: document.getElementById('fn').value.trim(),
+    pseudo:key,
+    dob:document.getElementById('dob').value.trim(),
+    birth:document.getElementById('birth').value.trim(),
+    nats:nats,
+    pos:document.getElementById('pos').value.trim(),
+    image:document.getElementById('preview').src||'',
+    career:parseCareer()
+  };
+  let matches=0,goals=0; p.career.forEach(r=>{ matches+=parseInt(r[2])||0; goals+=parseInt(r[3])||0 });
+  p.totals={matches,goals};
+  players[key]=p; saveToStorage(); closeForm(); renderList(); showPlayer(key);
+}
+
+renderList();
+</script>
 </body>
 </html>
