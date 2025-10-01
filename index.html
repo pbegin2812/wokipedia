@@ -32,13 +32,16 @@ table{border-collapse:collapse;width:100%;margin-top:12px}
 td,th{padding:6px 8px;border:1px solid #f0f5fb}
 .muted{color:var(--muted);font-size:14px}
 .controls{display:flex;gap:8px;margin-top:12px}
-.form{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff;max-height:50vh;overflow-y:auto}
+.form{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff;max-height:60vh;overflow-y:auto}
 label{display:block;font-size:13px;margin:6px 0 2px}
 input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-radius:6px}
 .flags{margin-top:4px;display:flex;gap:4px;flex-wrap:wrap}
 .flag-btn{cursor:pointer;padding:4px 8px;border:1px solid #d9e4f5;border-radius:6px;background:#f7faff;color:#111;font-size:14px;display:flex;align-items:center;gap:4px;transition:0.2s}
 .flag-btn img{width:20px;height:14px;object-fit:cover}
 .flag-btn:hover{background:#e1f0ff}
+#powerList div{padding:4px 8px;background:#f0f5ff;border:1px solid #d0e0ff;border-radius:4px;display:flex;align-items:center;gap:4px;margin-bottom:4px;}
+#uploadBtn{background:#1765c1;color:#fff;padding:8px 14px;border-radius:6px;cursor:pointer;border:none;transition:0.2s}
+#uploadBtn:hover{background:#0e4a8b}
 @media (max-width:900px){.layout{grid-template-columns:1fr}.sidebar{order:2}}
 </style>
 </head>
@@ -74,9 +77,14 @@ input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-rad
       <label>Pseudo</label><input id="pn">
       <label>Date de naissance</label><input id="dob" placeholder="JJ/MM/AAAA">
       <label>Lieu de naissance</label><input id="birth">
-      <label>Nationalités</label>
-      <input id="nats" placeholder="Sépare les commandes par des virgules, ex: !france,!usa">
-      <div id="natButtons" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px"></div>
+      
+      <label>Nationalités / Pouvoirs</label>
+      <div style="display:flex;gap:8px;margin-bottom:4px">
+        <input id="powerInput" placeholder="Rechercher une nationalité/pouvoir..." style="flex:1">
+        <button type="button" onclick="addPower()">Ajouter</button>
+      </div>
+      <div id="powerList" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+
       <label>Poste</label><input id="pos">
 
       <label>Carrière</label>
@@ -86,7 +94,11 @@ input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-rad
       </div>
 
       <label>Image</label>
-      <input type="file" id="uploadImg" accept="image/*">
+      <div style="display:flex;gap:8px;align-items:center">
+        <button type="button" id="uploadBtn">Choisir une image</button>
+        <span id="fileName" style="font-size:13px;color:#555"></span>
+      </div>
+      <input type="file" id="uploadImg" accept="image/*" style="display:none">
       <img id="preview" style="max-width:120px;margin-top:8px;display:block">
 
       <div style="display:flex;gap:8px;margin-top:10px">
@@ -105,7 +117,7 @@ const players = {
     pseudo:"Palinho",
     dob:"30/07/1992",
     birth:"London, England",
-    nats:["france","usa","uk"],
+    powers:["France","USA","Force"],
     pos:"Attaquant",
     image:"",
     career:[
@@ -117,19 +129,16 @@ const players = {
   }
 };
 
-// --- Commandes des pays
-const countryCommands = {
-  "!france":"France","!usa":"USA","!uk":"Royaume-Uni","!brazil":"Brésil","!spain":"Espagne","!philippines":"Philippines",
-  "!oman":"Oman","!germany":"Allemagne","!italy":"Italie","!russia":"Russie","!china":"Chine","!japan":"Japon"
-  // ... ajouter tous les autres pays basiquement
-};
-
-// --- Fichiers drapeaux
+// --- Commandes pays (exemples)
+const countryCommands = {"!france":"France","!usa":"USA","!uk":"Royaume-Uni","!brazil":"Brésil","!spain":"Espagne"};
 function getFlagSrc(name){ return `assets/${name}.png`; }
+
+// --- Pouvoirs/Nationalités autocomplete
+const powers = ["Force","Vitesse","Agilité","Intelligence","USA","France","Brésil","Espagne","Royaume-Uni"];
 
 // --- LocalStorage
 const saved = localStorage.getItem("wokipediaPlayers");
-if (saved) Object.assign(players, JSON.parse(saved));
+if(saved) Object.assign(players, JSON.parse(saved));
 function saveToStorage(){ localStorage.setItem("wokipediaPlayers", JSON.stringify(players)); }
 
 // --- Liste joueurs
@@ -143,110 +152,95 @@ function renderList(){
       li.onclick = ()=>showPlayer(name);
       list.appendChild(li);
     });
-  if(list.children.length===0){ const li = document.createElement('li'); li.textContent='Aucun joueur trouvé'; li.style.color='#888'; list.appendChild(li); }
+  if(list.children.length===0){ const li=document.createElement('li'); li.textContent='Aucun joueur trouvé'; li.style.color='#888'; list.appendChild(li);}
 }
 
-// --- Form nationalités avec drapeaux
-const natButtons = document.getElementById('natButtons');
-Object.keys(countryCommands).forEach(cmd=>{
-  const btn = document.createElement('button'); btn.className='flag-btn';
-  btn.innerHTML = `<img src="${getFlagSrc(countryCommands[cmd])}" alt="${countryCommands[cmd]}"> ${countryCommands[cmd]}`;
-  btn.onclick = ()=>{
-    const input = document.getElementById('nats');
-    const arr = input.value.split(',').map(s=>s.trim()).filter(Boolean);
-    if(!arr.includes(cmd)) arr.push(cmd);
-    input.value = arr.join(',');
-  };
-  natButtons.appendChild(btn);
-});
-
-// --- Affichage profil joueur avec drapeaux
+// --- Affichage profil joueur
 function showPlayer(key){
   const p = players[key]; const container = document.getElementById('detail'); container.innerHTML='';
   const header = document.createElement('div'); header.className='card-header';
   const avatar = document.createElement('div'); avatar.className='avatar';
-  const img = document.createElement('img'); img.src = p.image || ''; avatar.appendChild(img);
+  const img = document.createElement('img'); img.src=p.image||''; avatar.appendChild(img);
   const meta = document.createElement('div'); meta.className='meta';
 
-  const natDiv = document.createElement('div'); natDiv.className='flags';
-  p.nats.forEach(c=>{
-    const cmd = c.toLowerCase();
-    if(countryCommands[cmd]){
-      const f = document.createElement('img'); f.src=getFlagSrc(countryCommands[cmd]); f.style.width='20px'; f.style.height='14px'; f.style.marginRight='4px';
-      f.alt = countryCommands[cmd]; natDiv.appendChild(f);
+  const flagDiv = document.createElement('div'); flagDiv.className='flags';
+  (p.powers||[]).forEach(c=>{
+    if(countryCommands[c.toLowerCase()]){ 
+      const f = document.createElement('img'); f.src=getFlagSrc(countryCommands[c.toLowerCase()]); f.style.width='20px'; f.style.height='14px'; f.alt=c;
+      flagDiv.appendChild(f);
     }
   });
-
-  meta.innerHTML = `<h2>${key} <span style="font-size:14px;color:#666">(${p.fullname})</span></h2>
-                    <div class="muted">${p.pos} • Né(e) ${p.dob} • ${p.birth}</div>`;
-  meta.appendChild(natDiv);
+  meta.innerHTML=`<h2>${key} <span style="font-size:14px;color:#666">(${p.fullname})</span></h2>
+                   <div class="muted">${p.pos} • Né(e) ${p.dob} • ${p.birth}</div>`;
+  meta.appendChild(flagDiv);
   header.appendChild(avatar); header.appendChild(meta); container.appendChild(header);
 
   const t = document.createElement('table');
-  t.innerHTML = '<thead><tr><th>Période</th><th>Club</th><th>Matchs</th><th>Buts</th></tr></thead>';
-  const tb = document.createElement('tbody');
-  p.career.forEach(row=>{
-    const tr = document.createElement('tr');
-    let club = row[1].startsWith('!loan') ? '→ '+row[1].replace('!loan','').trim() : row[1];
-    [row[0], club, row[2], row[3]].forEach(v=>{ const td=document.createElement('td'); td.textContent=v; tr.appendChild(td); });
+  t.innerHTML='<thead><tr><th>Période</th><th>Club</th><th>Matchs</th><th>Buts</th></tr></thead>';
+  const tb=document.createElement('tbody');
+  (p.career||[]).forEach(row=>{
+    const tr=document.createElement('tr');
+    let club=row[1].startsWith('!loan') ? '→ '+row[1].replace('!loan','').trim() : row[1];
+    [row[0],club,row[2],row[3]].forEach(v=>{const td=document.createElement('td'); td.textContent=v; tr.appendChild(td);});
     tb.appendChild(tr);
   });
   t.appendChild(tb); container.appendChild(t);
 
-  const tot = document.createElement('div'); tot.style.marginTop='12px';
+  const tot=document.createElement('div'); tot.style.marginTop='12px';
   tot.innerHTML=`<strong>Totaux :</strong> ${p.totals.matches} matchs — ${p.totals.goals} buts`;
   container.appendChild(tot);
 
-  const controls = document.createElement('div'); controls.className='controls';
-  const btnEdit = document.createElement('button'); btnEdit.textContent='Modifier'; btnEdit.onclick=()=>openEdit(key);
+  const controls=document.createElement('div'); controls.className='controls';
+  const btnEdit=document.createElement('button'); btnEdit.textContent='Modifier'; btnEdit.onclick=()=>openEdit(key);
   controls.appendChild(btnEdit); container.appendChild(controls);
 }
 
 // --- Carrière dynamique
-function addCareerRow(data = {}){
-  const row = document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr 80px 80px"; row.style.gap="6px"; row.style.marginBottom="4px";
-  const inputPeriod=document.createElement("input"); inputPeriod.placeholder="2009–2010"; inputPeriod.value=data[0]||"";
-  const inputClub=document.createElement("input"); inputClub.placeholder="Club (ex: !loan Chelsea)"; inputClub.value=data[1]||"";
-  const inputMatches=document.createElement("input"); inputMatches.type="number"; inputMatches.placeholder="Matchs"; inputMatches.value=data[2]||"";
-  const inputGoals=document.createElement("input"); inputGoals.type="number"; inputGoals.placeholder="Buts"; inputGoals.value=data[3]||"";
-  row.append(inputPeriod,inputClub,inputMatches,inputGoals); document.getElementById("careerList").appendChild(row);
-}
-function parseCareer(){ return Array.from(document.querySelectorAll("#careerList div")).map(r=>[...r.querySelectorAll("input")].map(i=>i.value.trim())); }
+function addCareerRow(data={}){const row=document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr 80px 80px"; row.style.gap="6px"; row.style.marginBottom="4px";
+const inputPeriod=document.createElement("input"); inputPeriod.placeholder="2009–2010"; inputPeriod.value=data[0]||"";
+const inputClub=document.createElement("input"); inputClub.placeholder="Club (ex: !loan Chelsea)"; inputClub.value=data[1]||"";
+const inputMatches=document.createElement("input"); inputMatches.type="number"; inputMatches.placeholder="Matchs"; inputMatches.value=data[2]||"";
+const inputGoals=document.createElement("input"); inputGoals.type="number"; inputGoals.placeholder="Buts"; inputGoals.value=data[3]||"";
+row.append(inputPeriod,inputClub,inputMatches,inputGoals); document.getElementById("careerList").appendChild(row);}
+function parseCareer(){return Array.from(document.querySelectorAll("#careerList div")).map(r=>[...r.querySelectorAll("input")].map(i=>i.value.trim()));}
 
-// --- Formulaires
+// --- Pouvoirs / nationalités
+function addPower(val){val=val||document.getElementById('powerInput').value.trim(); if(!val) return;
+const list=document.getElementById('powerList'); const div=document.createElement('div');
+const span=document.createElement('span'); span.textContent=val;
+const note=document.createElement('input'); note.type="number"; note.min="0"; note.max="10"; note.placeholder="note"; note.style.width="40px";
+const btn=document.createElement('button'); btn.textContent="×"; btn.style.border="none"; btn.style.background="transparent"; btn.style.cursor="pointer"; btn.onclick=()=>list.removeChild(div);
+div.append(span,note,btn); list.appendChild(div); document.getElementById('powerInput').value="";}
+document.querySelector('button[onclick="addPower()"]').addEventListener('click',()=>addPower());
+document.getElementById('powerInput').addEventListener('input',()=>{ const val=document.getElementById('powerInput').value.toLowerCase(); const s=powers.find(p=>p.toLowerCase().startsWith(val)); if(s) document.getElementById('powerInput').value=s;});
+
+// --- Formulaire
 function openAdd(){document.getElementById('formbox').style.display='flex'; clearForm();}
-function openEdit(key){
-  document.getElementById('formbox').style.display='flex'; clearForm();
-  const p = players[key];
-  document.getElementById('fn').value=p.fullname||''; document.getElementById('pn').value=key||'';
-  document.getElementById('dob').value=p.dob||''; document.getElementById('birth').value=p.birth||'';
-  document.getElementById('nats').value=(p.nats||[]).join(',');
-  document.getElementById('pos').value=p.pos||''; document.getElementById('preview').src=p.image||'';
-  (p.career||[]).forEach(row=>addCareerRow(row));
-}
-function clearForm(){ ['fn','pn','dob','birth','nats','pos'].forEach(id=>document.getElementById(id).value=''); document.getElementById('careerList').innerHTML=''; document.getElementById('preview').src=''; }
+function openEdit(key){document.getElementById('formbox').style.display='flex'; clearForm();
+const p=players[key]; document.getElementById('fn').value=p.fullname||''; document.getElementById('pn').value=key||'';
+document.getElementById('dob').value=p.dob||''; document.getElementById('birth').value=p.birth||'';
+document.getElementById('pos').value=p.pos||''; document.getElementById('preview').src=p.image||'';
+(p.career||[]).forEach(row=>addCareerRow(row));
+(p.powers||[]).forEach(pow=>addPower(pow));}
+function clearForm(){['fn','pn','dob','birth','pos'].forEach(id=>document.getElementById(id).value=''); document.getElementById('careerList').innerHTML=''; document.getElementById('powerList').innerHTML=''; document.getElementById('preview').src=''; document.getElementById('fileName').textContent='';}
 function closeForm(){document.getElementById('formbox').style.display='none';}
-document.getElementById('uploadImg').addEventListener('change', e=>{ const file=e.target.files[0]; if(file){const url=URL.createObjectURL(file); document.getElementById('preview').src=url; document.getElementById('preview').dataset.tempUrl=url;} });
 
+// --- Upload image
+document.getElementById('uploadBtn').addEventListener('click',()=>document.getElementById('uploadImg').click());
+document.getElementById('uploadImg').addEventListener('change', e=>{const file=e.target.files[0]; if(file){document.getElementById('fileName').textContent=file.name; const url=URL.createObjectURL(file); document.getElementById('preview').src=url; document.getElementById('preview').dataset.tempUrl=url;}});
+
+// --- Sauvegarde
 function savePlayer(){
-  const key = document.getElementById('pn').value.trim(); if(!key){ alert('Le pseudo est requis'); return; }
-  const nats = document.getElementById('nats').value.split(',').map(s=>s.trim());
-  const p = {
-    fullname: document.getElementById('fn').value.trim(),
-    pseudo:key,
-    dob:document.getElementById('dob').value.trim(),
-    birth:document.getElementById('birth').value.trim(),
-    nats:nats,
-    pos:document.getElementById('pos').value.trim(),
-    image:document.getElementById('preview').src||'',
-    career:parseCareer()
-  };
-  let matches=0,goals=0; p.career.forEach(r=>{ matches+=parseInt(r[2])||0; goals+=parseInt(r[3])||0 });
-  p.totals={matches,goals};
+  const key=document.getElementById('pn').value.trim(); if(!key){alert('Pseudo requis'); return;}
+  const powersArr=Array.from(document.querySelectorAll('#powerList div span')).map(s=>s.textContent);
+  const p={fullname:document.getElementById('fn').value.trim(),pseudo:key,dob:document.getElementById('dob').value.trim(),birth:document.getElementById('birth').value.trim(),powers:powersArr,pos:document.getElementById('pos').value.trim(),image:document.getElementById('preview').src||'',career:parseCareer()};
+  let matches=0,goals=0; p.career.forEach(r=>{matches+=parseInt(r[2])||0;goals+=parseInt(r[3])||0;}); p.totals={matches,goals};
   players[key]=p; saveToStorage(); closeForm(); renderList(); showPlayer(key);
 }
 
+// --- Initial render
 renderList();
 </script>
+
 </body>
 </html>
