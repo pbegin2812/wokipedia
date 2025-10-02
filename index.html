@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wokipédia — Encyclopédie des joueurs fictifs</title>
+<title>Wokipédia</title>
 <link rel="icon" type="image/png" href="assets/Lettre _W_ en noir et blanc.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
@@ -20,14 +20,26 @@ h1{margin:0;font-size:24px;}
 .card img{width:100%;height:auto;object-fit:cover;border-radius:6px;}
 .add-card{background:#1765c1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:40px;cursor:pointer;}
 .add-card:hover{background:#0e4a8b;}
-.form-container{background:#fff;padding:16px;border-radius:10px;max-width:720px;width:100%;margin:auto;}
+.form-container{background:#fff;padding:16px;border-radius:10px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;margin:auto;}
 label{display:block;font-size:13px;margin:6px 0 2px;}
 input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-radius:6px;}
 #uploadBtn{background:#1765c1;color:#fff;padding:8px 14px;border-radius:6px;cursor:pointer;border:none;}
 #uploadBtn:hover{background:#0e4a8b;}
-.action-btn{background:#1765c1;color:#fff;padding:6px 12px;border-radius:6px;border:none;cursor:pointer;transition:0.2s;margin-right:6px;}
+.action-btn{background:#1765c1;color:#fff;padding:8px 14px;border-radius:6px;border:none;cursor:pointer;transition:0.2s;margin:4px;}
 .action-btn:hover{background:#0e4a8b;}
+.action-btn.danger{background:#c11c1c;}
+.action-btn.danger:hover{background:#8a1313;}
+.flag-list{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0;}
+.flag-item{display:flex;align-items:center;gap:4px;background:#f0f6ff;border:1px solid #d9e4f5;padding:4px 8px;border-radius:6px;}
+.flag-item img{width:20px;height:14px;object-fit:cover;border:1px solid #ccc;}
+.flag-item button{background:none;border:none;color:#c11c1c;font-size:14px;cursor:pointer;}
 #playerSearch{padding:8px;border:1px solid #d9e4f5;border-radius:6px;width:100%;margin-bottom:12px;}
+.search-box{position:relative;margin:6px 0;}
+.search-box input{width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;}
+.suggestions{position:absolute;z-index:10;background:#fff;border:1px solid #ccc;width:100%;max-height:180px;overflow-y:auto;border-radius:6px;}
+.suggestions div{padding:6px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.suggestions div:hover{background:#f0f6ff;}
+.suggestions img{width:20px;height:14px;border:1px solid #ccc;}
 </style>
 </head>
 <body>
@@ -46,17 +58,50 @@ input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-rad
     <div>
       <label>Nom complet</label><input id="fn">
       <label>Pseudo (facultatif)</label><input id="pn">
+
       <label>Date de naissance</label>
       <div style="display:flex;gap:4px;">
         <select id="dob_day"></select>
         <select id="dob_month"></select>
         <select id="dob_year"></select>
       </div>
+
       <label>Lieu de naissance</label><input id="birth">
+
+      <label>Nationalité(s)</label>
+      <div class="search-box">
+        <input id="natSearch" placeholder="Rechercher un pays...">
+        <div class="suggestions" id="natSuggest"></div>
+      </div>
+      <div class="flag-list" id="natList"></div>
+
+      <label>Nationalité sportive</label>
+      <div class="search-box">
+        <input id="sportNatSearch" placeholder="Rechercher un pays...">
+        <div class="suggestions" id="sportNatSuggest"></div>
+      </div>
+      <div class="flag-list" id="sportNatList"></div>
+
+      <label>Taille (cm)</label><input id="height" type="number" placeholder="ex: 182">
+
+      <label>Pied fort</label>
+      <select id="foot">
+        <option value="">-- Sélectionner --</option>
+        <option value="Gauche">Gauche</option>
+        <option value="Droit">Droit</option>
+        <option value="Ambidextre">Ambidextre</option>
+      </select>
+
       <label>Poste</label><input id="pos">
-      <label>Carrière</label>
+
+      <label>Parcours junior</label>
+      <div id="juniorList"></div>
+      <button type="button" class="action-btn" onclick="addJuniorRow()">+ Ajouter un club junior</button>
+
+      <label>Carrière pro</label>
       <div id="careerList"></div>
-      <button type="button" onclick="addCareerRow()">+ Ajouter une étape</button>
+      <button type="button" class="action-btn" onclick="addCareerRow()">+ Ajouter une étape</button>
+
       <label>Image</label>
       <div style="display:flex;gap:8px;align-items:center">
         <button type="button" id="uploadBtn">Choisir une image</button>
@@ -64,6 +109,7 @@ input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-rad
       </div>
       <input type="file" id="uploadImg" accept="image/*" style="display:none">
       <img id="preview" style="max-width:120px;margin-top:8px;display:block">
+
       <div style="margin-top:12px;">
         <button class="action-btn" onclick="savePlayer()">Enregistrer</button>
         <button class="action-btn" style="background:#eee;color:#111;" onclick="closeForm()">Annuler</button>
@@ -73,19 +119,33 @@ input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-rad
 </div>
 
 <script>
+const countries = [
+  {fr:"France",en:"france"},
+  {fr:"États-Unis",en:"usa"},
+  {fr:"Espagne",en:"spain"},
+  {fr:"Allemagne",en:"germany"},
+  {fr:"Italie",en:"italy"},
+  {fr:"Brésil",en:"brazil"},
+  {fr:"Argentine",en:"argentina"},
+  {fr:"Portugal",en:"portugal"},
+  {fr:"Angleterre",en:"england"},
+]; // exemple, à compléter
+
 const players = {};
-let editingKey = null; // 🔑 savoir si on édite
-// dates
-const daySelect = document.getElementById('dob_day');
-const monthSelect = document.getElementById('dob_month');
-const yearSelect = document.getElementById('dob_year');
-for(let d=1;d<=31;d++){ let o=new Option(d,d); daySelect.add(o);}
+let editingKey=null;
+
+// init date select
+const daySelect=document.getElementById('dob_day');
+const monthSelect=document.getElementById('dob_month');
+const yearSelect=document.getElementById('dob_year');
+for(let d=1;d<=31;d++) daySelect.add(new Option(d,d));
 ["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"].forEach((m,i)=>monthSelect.add(new Option(m,i+1)));
-for(let y=new Date().getFullYear();y>=1900;y--){ yearSelect.add(new Option(y,y)); }
-// storage
-const saved = localStorage.getItem("wokipediaPlayers");
+for(let y=new Date().getFullYear();y>=1900;y--) yearSelect.add(new Option(y,y));
+
+const saved=localStorage.getItem("wokipediaPlayers");
 if(saved) Object.assign(players, JSON.parse(saved));
-function saveToStorage(){ localStorage.setItem("wokipediaPlayers", JSON.stringify(players)); }
+function saveToStorage(){ localStorage.setItem("wokipediaPlayers",JSON.stringify(players)); }
+
 // menu
 function showMenu(){
   document.getElementById('formbox').style.display='none';
@@ -104,48 +164,127 @@ function showMenu(){
     const add=document.createElement('div'); add.className='card add-card'; add.textContent='+'; add.onclick=openAdd; grid.appendChild(add);
   }
 }
-// form
+
+// --- gestion nationalités ---
+function setupNatInput(inputId,suggestId,listId,isSport=false){
+  const input=document.getElementById(inputId);
+  const suggest=document.getElementById(suggestId);
+  const list=document.getElementById(listId);
+  input.oninput=()=>{
+    suggest.innerHTML='';
+    const val=input.value.toLowerCase();
+    if(!val) return;
+    countries.filter(c=>c.fr.toLowerCase().includes(val)||c.en.toLowerCase().includes(val)).forEach(c=>{
+      const div=document.createElement('div');
+      div.innerHTML=`<img src="flags/${c.en}.png"> ${c.fr}`;
+      div.onclick=()=>{
+        addFlag(list,c); input.value=''; suggest.innerHTML='';
+        if(isSport) list.innerHTML=''; // une seule nationalité sportive
+      };
+      suggest.appendChild(div);
+    });
+  };
+}
+function addFlag(list,c){
+  if([...list.querySelectorAll('.flag-item')].some(f=>f.dataset.en===c.en)) return;
+  const div=document.createElement('div'); div.className='flag-item'; div.dataset.en=c.en;
+  div.innerHTML=`<img src="flags/${c.en}.png"><span>${c.fr}</span> <button onclick="this.parentNode.remove()">✕</button>`;
+  list.appendChild(div);
+}
+function getFlags(listId){
+  return [...document.getElementById(listId).children].map(f=>({fr:f.querySelector('span').textContent,en:f.dataset.en}));
+}
+setupNatInput('natSearch','natSuggest','natList');
+setupNatInput('sportNatSearch','sportNatSuggest','sportNatList',true);
+
+// formulaire
 function openAdd(){ clearForm(); editingKey=null; document.getElementById('formTitle').textContent="Ajouter un joueur"; document.getElementById('formbox').style.display='flex'; }
-function openEdit(key){ clearForm(); editingKey=key; const p=players[key]; document.getElementById('formTitle').textContent="Modifier le joueur"; document.getElementById('fn').value=p.fullname; document.getElementById('pn').value=p.pseudo; document.getElementById('birth').value=p.birth; document.getElementById('pos').value=p.pos; const [d,m,y]=p.dob.split('/'); daySelect.value=d; monthSelect.value=m; yearSelect.value=y; document.getElementById('careerList').innerHTML=''; if(p.career)p.career.forEach(r=>addCareerRow(r)); document.getElementById('preview').src=p.image; document.getElementById('formbox').style.display='flex'; }
+function openEdit(key){
+  clearForm(); editingKey=key; const p=players[key];
+  document.getElementById('formTitle').textContent="Modifier le joueur";
+  document.getElementById('fn').value=p.fullname; document.getElementById('pn').value=p.pseudo;
+  document.getElementById('birth').value=p.birth; document.getElementById('pos').value=p.pos;
+  if(p.dob){const [d,m,y]=p.dob.split('/'); daySelect.value=d; monthSelect.value=m; yearSelect.value=y;}
+  document.getElementById('height').value=p.height||''; document.getElementById('foot').value=p.foot||'';
+  if(p.nats) p.nats.forEach(c=>addFlag(document.getElementById('natList'),c));
+  if(p.sportNat) addFlag(document.getElementById('sportNatList'),p.sportNat);
+  document.getElementById('juniorList').innerHTML=''; if(p.junior)p.junior.forEach(r=>addJuniorRow(r));
+  document.getElementById('careerList').innerHTML=''; if(p.career)p.career.forEach(r=>addCareerRow(r));
+  document.getElementById('preview').src=p.image;
+  document.getElementById('formbox').style.display='flex';
+}
 function closeForm(){document.getElementById('formbox').style.display='none';}
-function clearForm(){ document.getElementById('fn').value=''; document.getElementById('pn').value=''; document.getElementById('birth').value=''; document.getElementById('pos').value=''; document.getElementById('careerList').innerHTML=''; document.getElementById('preview').src=''; document.getElementById('fileName').textContent=''; daySelect.value=1; monthSelect.value=1; yearSelect.value=new Date().getFullYear(); }
-function addCareerRow(data=["","","",""]){ const row=document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr 80px 80px"; row.style.gap="4px"; row.style.marginBottom="4px"; ["Période","Club","Matchs","Buts"].forEach((ph,i)=>{ const inp=document.createElement("input"); inp.value=data[i]||""; inp.placeholder=ph; if(i>=2)inp.type="number"; row.appendChild(inp); }); document.getElementById("careerList").appendChild(row);}
+function clearForm(){
+  ['fn','pn','birth','pos','height'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('foot').value='';
+  document.getElementById('natList').innerHTML=''; document.getElementById('sportNatList').innerHTML='';
+  document.getElementById('juniorList').innerHTML=''; document.getElementById('careerList').innerHTML='';
+  document.getElementById('preview').src=''; document.getElementById('fileName').textContent='';
+  daySelect.value=1; monthSelect.value=1; yearSelect.value=new Date().getFullYear();
+}
+function addCareerRow(data=["","","",""]){
+  const row=document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr 80px 80px"; row.style.gap="4px"; row.style.marginBottom="4px";
+  ["Période","Club","Matchs","Buts"].forEach((ph,i)=>{ const inp=document.createElement("input"); inp.value=data[i]||""; inp.placeholder=ph; if(i>=2)inp.type="number"; row.appendChild(inp); });
+  document.getElementById("careerList").appendChild(row);
+}
 function parseCareer(){ return Array.from(document.querySelectorAll("#careerList div")).map(r=>[...r.querySelectorAll("input")].map(i=>i.value.trim())); }
-// upload
+function addJuniorRow(data=["",""]){
+  const row=document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr"; row.style.gap="4px"; row.style.marginBottom="4px";
+  ["Période","Club junior"].forEach((ph,i)=>{ const inp=document.createElement("input"); inp.value=data[i]||""; inp.placeholder=ph; row.appendChild(inp); });
+  document.getElementById("juniorList").appendChild(row);
+}
+function parseJunior(){ return Array.from(document.querySelectorAll("#juniorList div")).map(r=>[...r.querySelectorAll("input")].map(i=>i.value.trim())); }
 document.getElementById('uploadBtn').onclick=()=>document.getElementById('uploadImg').click();
 document.getElementById('uploadImg').onchange=e=>{const f=e.target.files[0]; if(f){const url=URL.createObjectURL(f); document.getElementById('preview').src=url; document.getElementById('fileName').textContent=f.name; }}
-// save
 function savePlayer(){
   const fn=document.getElementById('fn').value.trim(); if(!fn){alert('Nom requis'); return;}
   const pseudo=document.getElementById('pn').value.trim();
   const dob=`${daySelect.value}/${monthSelect.value}/${yearSelect.value}`;
   const birth=document.getElementById('birth').value.trim();
   const pos=document.getElementById('pos').value.trim();
+  const height=document.getElementById('height').value.trim();
+  const foot=document.getElementById('foot').value;
+  const nats=getFlags('natList');
+  const sportNat=getFlags('sportNatList')[0]||null;
+  const junior=parseJunior();
   const career=parseCareer();
   const img=document.getElementById('preview').src||'';
   let matches=0, goals=0; career.forEach(r=>{ matches+=parseInt(r[2])||0; goals+=parseInt(r[3])||0; });
-  const data={ fullname:fn, pseudo, dob, birth, pos, career, image:img, totals:{matches,goals} };
-  // mode édition ou ajout
-  const key = editingKey || fn;
-  players[key]=data;
-  saveToStorage();
-  closeForm();
-  showMenu();
+  const data={ fullname:fn, pseudo, dob, birth, pos, height, foot, nats, sportNat, junior, career, image:img, totals:{matches,goals} };
+  const key=editingKey||fn;
+  players[key]=data; saveToStorage(); closeForm(); showMenu();
 }
+function deletePlayer(key){ if(confirm("Supprimer ce joueur ?")){ delete players[key]; saveToStorage(); showMenu(); } }
 // fiche joueur
 function showPlayer(key){
   const p=players[key]; const c=document.getElementById('mainContainer'); c.innerHTML='';
   const div=document.createElement('div'); div.className='form-container';
-  let careerHtml='<table><thead><tr><th>Période</th><th>Club</th><th>Matchs</th><th>Buts</th></tr></thead><tbody>';
+  const natHtml=p.nats&&p.nats.length?'<div class="flag-list">'+p.nats.map(c=>`<div class="flag-item"><img src="flags/${c.en}.png">${c.fr}</div>`).join('')+'</div>':'';
+  const sportHtml=p.sportNat?'<div class="flag-list"><div class="flag-item"><img src="flags/'+p.sportNat.en+'.png">'+p.sportNat.fr+'</div></div>':'';
+  let juniorHtml=''; if(p.junior&&p.junior.length){ juniorHtml='<h4>Parcours junior</h4><ul>'+p.junior.map(r=>`<li>${r[0]} — ${r[1]}</li>`).join('')+'</ul>'; }
+  let careerHtml='<h4>Carrière professionnelle</h4><table><thead><tr><th>Période</th><th>Club</th><th>Matchs</th><th>Buts</th></tr></thead><tbody>';
   if(p.career)p.career.forEach(r=>{ careerHtml+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`; }); careerHtml+='</tbody></table>';
-  div.innerHTML=`<div style="display:flex;gap:12px;align-items:center"><div style="width:96px;height:128px;background:#eee;overflow:hidden"><img src="${p.image}" style="width:100%;height:100%;object-fit:cover"></div>
-  <div><h2>${p.fullname}</h2>${p.pseudo?'<span>'+p.pseudo+'</span>':''}<br><span>${p.pos} • ${p.dob} • ${p.birth}</span></div></div>
+  div.innerHTML=`<div style="display:flex;gap:12px;align-items:center">
+    <div style="width:96px;height:128px;background:#eee;overflow:hidden"><img src="${p.image}" style="width:100%;height:100%;object-fit:cover"></div>
+    <div>
+      <h2>${p.fullname}</h2>${p.pseudo?'<span>'+p.pseudo+'</span><br>':''}
+      <span>${p.pos} • ${p.dob} • ${p.birth}</span><br>
+      ${p.height?'<strong>Taille:</strong> '+p.height+' cm<br>':''}
+      ${p.foot?'<strong>Pied fort:</strong> '+p.foot+'<br>':''}
+      ${p.nats&&p.nats.length?'<strong>Nationalités:</strong>'+natHtml:''}
+      ${p.sportNat?'<strong>Nationalité sportive:</strong>'+sportHtml:''}
+    </div>
+  </div>
+  ${juniorHtml}
   ${careerHtml}
   <div><strong>Totaux :</strong> ${p.totals.matches} matchs — ${p.totals.goals} buts</div>
-  <div style="margin-top:12px;"><button class="action-btn" onclick="openEdit('${key}')">Modifier</button> <button class="action-btn" onclick="showMenu()">Retour</button></div>`;
+  <div style="margin-top:12px;">
+    <button class="action-btn" onclick="openEdit('${key}')">Modifier</button>
+    <button class="action-btn danger" onclick="deletePlayer('${key}')">Supprimer</button>
+    <button class="action-btn" onclick="showMenu()">Retour</button>
+  </div>`;
   c.appendChild(div);
 }
-// init
 showMenu();
 </script>
 </body>
