@@ -1,512 +1,931 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wokipédia</title>
-<link rel="icon" type="image/png" href="assets/Lettre _W_ en noir et blanc.png">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
-body, input, button, select, textarea { font-family: 'Lexend', sans-serif; margin:0; padding:0; box-sizing:border-box;}
-:root{--bg:#fff;--accent:#1765c1;}
-body{background:var(--bg);color:#111;}
-header{background:#f4f7fb;padding:12px 24px;border-bottom:1px solid #e6eef9;display:flex;align-items:center;gap:12px;}
-header img{width:40px;height:40px;cursor:pointer;}
-.wrap{max-width:1100px;margin:20px auto;padding:0 20px;}
-h1{margin:0;font-size:24px;}
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
-.card{background:#fff;border:1px solid #eef6ff;border-radius:8px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;transition:0.2s;padding:8px;}
-.card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.15);}
-.card img{width:100%;height:auto;object-fit:cover;border-radius:6px;}
-.add-card{background:#1765c1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:40px;cursor:pointer;}
-.add-card:hover{background:#0e4a8b;}
-.form-container{background:#fff;padding:16px;border-radius:10px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;margin:auto;}
-label{display:block;font-size:13px;margin:6px 0 2px;}
-input,textarea,select{width:100%;padding:8px;border:1px solid #dfeaf9;border-radius:6px;}
-#uploadBtn{background:#1765c1;color:#fff;padding:8px 14px;border-radius:6px;cursor:pointer;border:none;}
-#uploadBtn:hover{background:#0e4a8b;}
-.action-btn{background:#1765c1;color:#fff;padding:8px 14px;border-radius:6px;border:none;cursor:pointer;transition:0.2s;margin:4px;}
-.action-btn:hover{background:#0e4a8b;}
-.action-btn.danger{background:#c11c1c;}
-.action-btn.danger:hover{background:#8a1313;}
-.flag-list{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0;}
-.flag-item{display:flex;align-items:center;gap:4px;background:#f0f6ff;border:1px solid #d9e4f5;padding:4px 8px;border-radius:6px;}
-.flag-item img{width:20px;height:14px;object-fit:cover;border:1px solid #ccc;}
-.flag-item button{background:none;border:none;color:#c11c1c;font-size:14px;cursor:pointer;}
-#playerSearch{padding:8px;border:1px solid #d9e4f5;border-radius:6px;width:100%;margin-bottom:12px;}
-.search-box{position:relative;margin:6px 0;}
-.search-box input{width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;}
-.suggestions{position:absolute;z-index:10;background:#fff;border:1px solid #ccc;width:100%;max-height:180px;overflow-y:auto;border-radius:6px;}
-.suggestions div{padding:6px;cursor:pointer;display:flex;align-items:center;gap:6px;}
-.suggestions div:hover{background:#f0f6ff;}
-.suggestions img{width:20px;height:14px;border:1px solid #ccc;}
-</style>
-</head>
-<body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Wokipédia</title>
+		<link
+			rel="icon"
+			type="image/png"
+			href="assets/Lettre _W_ en noir et blanc.png"
+		/>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap");
+			body,
+			input,
+			button,
+			select,
+			textarea {
+				font-family: "Lexend", sans-serif;
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			:root {
+				--bg: #fff;
+				--accent: #1765c1;
+			}
+			body {
+				background: var(--bg);
+				color: #111;
+			}
+			header {
+				background: #f4f7fb;
+				padding: 12px 24px;
+				border-bottom: 1px solid #e6eef9;
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+			header img {
+				width: 40px;
+				height: 40px;
+				cursor: pointer;
+			}
+			.wrap {
+				max-width: 1100px;
+				margin: 20px auto;
+				padding: 0 20px;
+			}
+			h1 {
+				margin: 0;
+				font-size: 24px;
+			}
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+				gap: 12px;
+			}
+			.card {
+				background: #fff;
+				border: 1px solid #eef6ff;
+				border-radius: 8px;
+				overflow: hidden;
+				cursor: pointer;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				text-align: center;
+				transition: 0.2s;
+				padding: 8px;
+			}
+			.card:hover {
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+			}
+			.card img {
+				width: 100%;
+				height: auto;
+				object-fit: cover;
+				border-radius: 6px;
+			}
+			.add-card {
+				background: #1765c1;
+				color: #fff;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 40px;
+				cursor: pointer;
+			}
+			.add-card:hover {
+				background: #0e4a8b;
+			}
+			.form-container {
+				background: #fff;
+				padding: 16px;
+				border-radius: 10px;
+				max-width: 720px;
+				width: 100%;
+				max-height: 90vh;
+				overflow-y: auto;
+				margin: auto;
+			}
+			label {
+				display: block;
+				font-size: 13px;
+				margin: 6px 0 2px;
+			}
+			input,
+			textarea,
+			select {
+				width: 100%;
+				padding: 8px;
+				border: 1px solid #dfeaf9;
+				border-radius: 6px;
+			}
+			#uploadBtn {
+				background: #1765c1;
+				color: #fff;
+				padding: 8px 14px;
+				border-radius: 6px;
+				cursor: pointer;
+				border: none;
+			}
+			#uploadBtn:hover {
+				background: #0e4a8b;
+			}
+			.action-btn {
+				background: #1765c1;
+				color: #fff;
+				padding: 8px 14px;
+				border-radius: 6px;
+				border: none;
+				cursor: pointer;
+				transition: 0.2s;
+				margin: 4px;
+			}
+			.action-btn:hover {
+				background: #0e4a8b;
+			}
+			.action-btn.danger {
+				background: #c11c1c;
+			}
+			.action-btn.danger:hover {
+				background: #8a1313;
+			}
+			.flag-list {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				margin: 6px 0;
+			}
+			.flag-item {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				background: #f0f6ff;
+				border: 1px solid #d9e4f5;
+				padding: 4px 8px;
+				border-radius: 6px;
+			}
+			.flag-item img {
+				width: 20px;
+				height: 14px;
+				object-fit: cover;
+				border: 1px solid #ccc;
+			}
+			.flag-item button {
+				background: none;
+				border: none;
+				color: #c11c1c;
+				font-size: 14px;
+				cursor: pointer;
+			}
+			#playerSearch {
+				padding: 8px;
+				border: 1px solid #d9e4f5;
+				border-radius: 6px;
+				width: 100%;
+				margin-bottom: 12px;
+			}
+			.search-box {
+				position: relative;
+				margin: 6px 0;
+			}
+			.search-box input {
+				width: 100%;
+				padding: 8px 12px;
+				border: 1px solid #ccc;
+				border-radius: 6px;
+			}
+			.suggestions {
+				position: absolute;
+				z-index: 10;
+				background: #fff;
+				border: 1px solid #ccc;
+				width: 100%;
+				max-height: 180px;
+				overflow-y: auto;
+				border-radius: 6px;
+			}
+			.suggestions div {
+				padding: 6px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.suggestions div:hover {
+				background: #f0f6ff;
+			}
+			.suggestions img {
+				width: 20px;
+				height: 14px;
+				border: 1px solid #ccc;
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<img src="assets/wokipédia.png" alt="Accueil" onclick="showMenu()" />
+			<h1>Wokipédia</h1>
+		</header>
 
-<header>
-  <img src="assets/wokipédia.png" alt="Accueil" onclick="showMenu()">
-  <h1>Wokipédia</h1>
-</header>
+		<div class="wrap" id="mainContainer"></div>
 
-<div class="wrap" id="mainContainer"></div>
+		<!-- Form modal -->
+		<div
+			id="formbox"
+			style="
+				display: none;
+				position: fixed;
+				inset: 0;
+				background: rgba(10, 20, 40, 0.45);
+				align-items: center;
+				justify-content: center;
+				padding: 20px;
+			"
+		>
+			<div class="form-container">
+				<h3 id="formTitle">Ajouter un joueur</h3>
+				<div>
+					<label>Nom complet</label><input id="fn" />
+					<label>Pseudo (facultatif)</label><input id="pn" />
 
-<!-- Form modal -->
-<div id="formbox" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.45);align-items:center;justify-content:center;padding:20px">
-  <div class="form-container">
-    <h3 id="formTitle">Ajouter un joueur</h3>
+					<label>Date de naissance</label>
+					<div style="display: flex; gap: 4px">
+						<select id="dob_day"></select>
+						<select id="dob_month"></select>
+						<select id="dob_year"></select>
+					</div>
+
+					<label>Lieu de naissance</label><input id="birth" />
+
+					<label>Nationalité(s)</label>
+					<div class="search-box">
+						<input id="natSearch" placeholder="Rechercher un pays..." />
+						<div class="suggestions" id="natSuggest"></div>
+					</div>
+					<div class="flag-list" id="natList"></div>
+
+					<label>Nationalité sportive</label>
+					<div class="search-box">
+						<input id="sportNatSearch" placeholder="Rechercher un pays..." />
+						<div class="suggestions" id="sportNatSuggest"></div>
+					</div>
+					<div class="flag-list" id="sportNatList"></div>
+
+					<label>Taille (cm)</label
+					><input id="height" type="number" placeholder="ex: 182" />
+
+					<label>Pied fort</label>
+					<select id="foot">
+						<option value="">-- Sélectionner --</option>
+						<option value="Gauche">Gauche</option>
+						<option value="Droit">Droit</option>
+						<option value="Ambidextre">Ambidextre</option>
+					</select>
+
+					<label>Poste</label><input id="pos" />
+
+					<label>Parcours junior</label>
+					<div id="juniorList"></div>
+					<button type="button" class="action-btn" onclick="addJuniorRow()">
+						+ Ajouter un club junior
+					</button>
+
+					<label>Carrière pro</label>
+					<div id="careerList"></div>
+					<button type="button" class="action-btn" onclick="addCareerRow()">
+						+ Ajouter une étape
+					</button>
+
+					<label>Équipe nationale</label>
+					<div id="nationalList"></div>
+					<button type="button" class="action-btn" onclick="addNationalRow()">
+						+ Ajouter une sélection
+					</button>
+
+					<label>Image</label>
+					<div style="display: flex; gap: 8px; align-items: center">
+						<button type="button" id="uploadBtn">Choisir une image</button>
+						<span id="fileName" style="font-size: 13px; color: #555"></span>
+					</div>
+					<input
+						type="file"
+						id="uploadImg"
+						accept="image/*"
+						style="display: none"
+					/>
+					<img
+						id="preview"
+						style="max-width: 120px; margin-top: 8px; display: block"
+					/>
+
+					<div style="margin-top: 12px">
+						<button class="action-btn" onclick="savePlayer()">
+							Enregistrer
+						</button>
+						<button
+							class="action-btn"
+							style="background: #eee; color: #111"
+							onclick="closeForm()"
+						>
+							Annuler
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// === Liste de TOUS les pays du monde ===
+			// Format: {fr:"France", en:"france"} => drapeau = flags/france.png
+			// ⚠️ Ici j’en mets un extrait pour exemple. Tu peux coller la liste complète ISO3166 FR/EN.
+			const countries = [
+				{ fr: "France", en: "france" },
+				{ fr: "Allemagne", en: "germany" },
+				{ fr: "Italie", en: "italy" },
+				{ fr: "Espagne", en: "spain" },
+				{ fr: "Portugal", en: "portugal" },
+				{ fr: "Angleterre", en: "england" },
+				{ fr: "États-Unis", en: "usa" },
+				{ fr: "Brésil", en: "brazil" },
+				{ fr: "Argentine", en: "argentina" },
+				{ fr: "Canada", en: "canada" },
+				{ fr: "Mexique", en: "mexico" },
+				{ fr: "Japon", en: "japan" },
+				{ fr: "Chine", en: "china" },
+				{ fr: "Corée du Sud", en: "south-korea" },
+				{ fr: "Nigéria", en: "nigeria" },
+				{ fr: "Égypte", en: "egypt" },
+				{ fr: "Maroc", en: "morocco" },
+				{ fr: "Afghanistan", en: "afghanistan" },
+				{ fr: "Afrique du Sud", en: "south-africa" },
+				{ fr: "Albanie", en: "albania" },
+				{ fr: "Algérie", en: "algeria" },
+				{ fr: "Allemagne", en: "germany" },
+				{ fr: "Andorre", en: "andorra" },
+				{ fr: "Angola", en: "angola" },
+				{ fr: "Antigua-et-Barbuda", en: "antigua-and-barbuda" },
+				{ fr: "Arabie saoudite", en: "saudi-arabia" },
+				{ fr: "Argentine", en: "argentina" },
+				{ fr: "Arménie", en: "armenia" },
+				{ fr: "Australie", en: "australia" },
+				{ fr: "Autriche", en: "austria" },
+				{ fr: "Azerbaïdjan", en: "azerbaijan" },
+				{ fr: "Bahamas", en: "bahamas" },
+				{ fr: "Bahreïn", en: "bahrain" },
+				{ fr: "Bangladesh", en: "bangladesh" },
+				{ fr: "Barbade", en: "barbados" },
+				{ fr: "Belgique", en: "belgium" },
+				{ fr: "Belize", en: "belize" },
+				{ fr: "Bénin", en: "benin" },
+				{ fr: "Bhoutan", en: "bhutan" },
+				{ fr: "Biélorussie", en: "belarus" },
+				{ fr: "Birmanie", en: "myanmar" },
+				{ fr: "Bolivie", en: "bolivia" },
+				{ fr: "Bosnie-Herzégovine", en: "bosnia-and-herzegovina" },
+				{ fr: "Botswana", en: "botswana" },
+				{ fr: "Brésil", en: "brazil" },
+				{ fr: "Brunei", en: "brunei" },
+				{ fr: "Bulgarie", en: "bulgaria" },
+				{ fr: "Burkina Faso", en: "burkina-faso" },
+				{ fr: "Burundi", en: "burundi" },
+				{ fr: "Cambodge", en: "cambodia" },
+				{ fr: "Cameroun", en: "cameroon" },
+				{ fr: "Canada", en: "canada" },
+				{ fr: "Cap-Vert", en: "cape-verde" },
+				{ fr: "Chili", en: "chile" },
+				{ fr: "Chine", en: "china" },
+				{ fr: "Chypre", en: "cyprus" },
+				{ fr: "Colombie", en: "colombia" },
+				{ fr: "Comores", en: "comoros" },
+				{ fr: "Congo-Brazzaville", en: "congo" },
+				{ fr: "Congo-Kinshasa", en: "democratic-republic-of-the-congo" },
+				{ fr: "Corée du Nord", en: "north-korea" },
+				{ fr: "Corée du Sud", en: "south-korea" },
+				{ fr: "Costa Rica", en: "costa-rica" },
+				{ fr: "Côte d'Ivoire", en: "ivory-coast" },
+				{ fr: "Croatie", en: "croatia" },
+				{ fr: "Cuba", en: "cuba" },
+				{ fr: "Danemark", en: "denmark" },
+				{ fr: "Djibouti", en: "djibouti" },
+				{ fr: "Dominique", en: "dominica" },
+				{ fr: "Égypte", en: "egypt" },
+				{ fr: "Émirats arabes unis", en: "united-arab-emirates" },
+				{ fr: "Équateur", en: "ecuador" },
+				{ fr: "Érythrée", en: "eritrea" },
+				{ fr: "Espagne", en: "spain" },
+				{ fr: "Estonie", en: "estonia" },
+				{ fr: "Eswatini", en: "eswatini" },
+				{ fr: "États-Unis", en: "usa" },
+				{ fr: "Éthiopie", en: "ethiopia" },
+				{ fr: "Fidji", en: "fiji" },
+				{ fr: "Finlande", en: "finland" },
+				{ fr: "France", en: "france" },
+				{ fr: "Gabon", en: "gabon" },
+				{ fr: "Gambie", en: "gambia" },
+				{ fr: "Géorgie", en: "georgia" },
+				{ fr: "Ghana", en: "ghana" },
+				{ fr: "Grèce", en: "greece" },
+				{ fr: "Grenade", en: "grenada" },
+				{ fr: "Guatemala", en: "guatemala" },
+				{ fr: "Guinée", en: "guinea" },
+				{ fr: "Guinée-Bissau", en: "guinea-bissau" },
+				{ fr: "Guinée équatoriale", en: "equatorial-guinea" },
+				{ fr: "Guyana", en: "guyana" },
+				{ fr: "Haïti", en: "haiti" },
+				{ fr: "Honduras", en: "honduras" },
+				{ fr: "Hongrie", en: "hungary" },
+				{ fr: "Îles Marshall", en: "marshall-islands" },
+				{ fr: "Îles Salomon", en: "solomon-islands" },
+				{ fr: "Inde", en: "india" },
+				{ fr: "Indonésie", en: "indonesia" },
+				{ fr: "Irak", en: "iraq" },
+				{ fr: "Iran", en: "iran" },
+				{ fr: "Irlande", en: "ireland" },
+				{ fr: "Islande", en: "iceland" },
+				{ fr: "Israël", en: "israel" },
+				{ fr: "Italie", en: "italy" },
+				{ fr: "Jamaïque", en: "jamaica" },
+				{ fr: "Japon", en: "japan" },
+				{ fr: "Jordanie", en: "jordan" },
+				{ fr: "Kazakhstan", en: "kazakhstan" },
+				{ fr: "Kenya", en: "kenya" },
+				{ fr: "Kirghizistan", en: "kyrgyzstan" },
+				{ fr: "Kiribati", en: "kiribati" },
+				{ fr: "Kosovo", en: "kosovo" },
+				{ fr: "Koweït", en: "kuwait" },
+				{ fr: "Laos", en: "laos" },
+				{ fr: "Lesotho", en: "lesotho" },
+				{ fr: "Lettonie", en: "latvia" },
+				{ fr: "Liban", en: "lebanon" },
+				{ fr: "Libéria", en: "liberia" },
+				{ fr: "Libye", en: "libya" },
+				{ fr: "Liechtenstein", en: "liechtenstein" },
+				{ fr: "Lituanie", en: "lithuania" },
+				{ fr: "Luxembourg", en: "luxembourg" },
+				{ fr: "Macédoine du Nord", en: "north-macedonia" },
+				{ fr: "Madagascar", en: "madagascar" },
+				{ fr: "Malaisie", en: "malaysia" },
+				{ fr: "Malawi", en: "malawi" },
+				{ fr: "Maldives", en: "maldives" },
+				{ fr: "Mali", en: "mali" },
+				{ fr: "Malte", en: "malta" },
+				{ fr: "Maroc", en: "morocco" },
+				{ fr: "Maurice", en: "mauritius" },
+				{ fr: "Mauritanie", en: "mauritania" },
+				{ fr: "Mexique", en: "mexico" },
+				{ fr: "Micronésie", en: "micronesia" },
+				{ fr: "Moldavie", en: "moldova" },
+				{ fr: "Monaco", en: "monaco" },
+				{ fr: "Mongolie", en: "mongolia" },
+				{ fr: "Monténégro", en: "montenegro" },
+				{ fr: "Mozambique", en: "mozambique" },
+				{ fr: "Namibie", en: "namibia" },
+				{ fr: "Nauru", en: "nauru" },
+				{ fr: "Népal", en: "nepal" },
+				{ fr: "Nicaragua", en: "nicaragua" },
+				{ fr: "Niger", en: "niger" },
+				{ fr: "Nigéria", en: "nigeria" },
+				{ fr: "Norvège", en: "norway" },
+				{ fr: "Nouvelle-Zélande", en: "new-zealand" },
+				{ fr: "Oman", en: "oman" },
+				{ fr: "Ouganda", en: "uganda" },
+				{ fr: "Ouzbékistan", en: "uzbekistan" },
+				{ fr: "Pakistan", en: "pakistan" },
+				{ fr: "Palaos", en: "palau" },
+				{ fr: "Palestine", en: "palestine" },
+				{ fr: "Panama", en: "panama" },
+				{ fr: "Papouasie-Nouvelle-Guinée", en: "papua-new-guinea" },
+				{ fr: "Paraguay", en: "paraguay" },
+				{ fr: "Pays-Bas", en: "netherlands" },
+				{ fr: "Pérou", en: "peru" },
+				{ fr: "Philippines", en: "philippines" },
+				{ fr: "Pologne", en: "poland" },
+				{ fr: "Portugal", en: "portugal" },
+				{ fr: "Qatar", en: "qatar" },
+				{ fr: "République centrafricaine", en: "central-african-republic" },
+				{ fr: "République dominicaine", en: "dominican-republic" },
+				{ fr: "République tchèque", en: "czechia" },
+				{ fr: "Roumanie", en: "romania" },
+				{ fr: "Royaume-Uni", en: "united-kingdom" },
+				{ fr: "Russie", en: "russia" },
+				{ fr: "Rwanda", en: "rwanda" },
+				{ fr: "Saint-Christophe-et-Niévès", en: "saint-kitts-and-nevis" },
+				{ fr: "Sainte-Lucie", en: "saint-lucia" },
+				{ fr: "Saint-Marin", en: "san-marino" },
+				{
+					fr: "Saint-Vincent-et-les-Grenadines",
+					en: "saint-vincent-and-the-grenadines",
+				},
+				{ fr: "Salvador", en: "el-salvador" },
+				{ fr: "Samoa", en: "samoa" },
+				{ fr: "Sao Tomé-et-Principe", en: "sao-tome-and-principe" },
+				{ fr: "Sénégal", en: "senegal" },
+				{ fr: "Serbie", en: "serbia" },
+				{ fr: "Seychelles", en: "seychelles" },
+				{ fr: "Sierra Leone", en: "sierra-leone" },
+				{ fr: "Singapour", en: "singapore" },
+				{ fr: "Slovaquie", en: "slovakia" },
+				{ fr: "Slovénie", en: "slovenia" },
+				{ fr: "Somalie", en: "somalia" },
+				{ fr: "Soudan", en: "sudan" },
+				{ fr: "Soudan du Sud", en: "south-sudan" },
+				{ fr: "Sri Lanka", en: "sri-lanka" },
+				{ fr: "Suède", en: "sweden" },
+				{ fr: "Suisse", en: "switzerland" },
+				{ fr: "Suriname", en: "suriname" },
+				{ fr: "Syrie", en: "syria" },
+				{ fr: "Tadjikistan", en: "tajikistan" },
+				{ fr: "Tanzanie", en: "tanzania" },
+				{ fr: "Tchad", en: "chad" },
+				{ fr: "Thaïlande", en: "thailand" },
+				{ fr: "Timor oriental", en: "east-timor" },
+				{ fr: "Togo", en: "togo" },
+				{ fr: "Tonga", en: "tonga" },
+				{ fr: "Trinité-et-Tobago", en: "trinidad-and-tobago" },
+				{ fr: "Tunisie", en: "tunisia" },
+				{ fr: "Turkménistan", en: "turkmenistan" },
+				{ fr: "Turquie", en: "turkey" },
+				{ fr: "Tuvalu", en: "tuvalu" },
+				{ fr: "Ukraine", en: "ukraine" },
+				{ fr: "Uruguay", en: "uruguay" },
+				{ fr: "Vanuatu", en: "vanuatu" },
+				{ fr: "Vatican", en: "vatican" },
+				{ fr: "Venezuela", en: "venezuela" },
+				{ fr: "Viêt Nam", en: "vietnam" },
+				{ fr: "Yémen", en: "yemen" },
+				{ fr: "Zambie", en: "zambia" },
+				{ fr: "Zimbabwe", en: "zimbabwe" },
+			];
+
+			const players = {};
+			let editingKey = null;
+
+			// init date select
+			const daySelect = document.getElementById("dob_day");
+			const monthSelect = document.getElementById("dob_month");
+			const yearSelect = document.getElementById("dob_year");
+			for (let d = 1; d <= 31; d++) daySelect.add(new Option(d, d));
+			[
+				"Jan",
+				"Fév",
+				"Mar",
+				"Avr",
+				"Mai",
+				"Juin",
+				"Juil",
+				"Août",
+				"Sep",
+				"Oct",
+				"Nov",
+				"Déc",
+			].forEach((m, i) => monthSelect.add(new Option(m, i + 1)));
+			for (let y = new Date().getFullYear(); y >= 1900; y--)
+				yearSelect.add(new Option(y, y));
+
+			const saved = localStorage.getItem("wokipediaPlayers");
+			if (saved) Object.assign(players, JSON.parse(saved));
+			function saveToStorage() {
+				localStorage.setItem("wokipediaPlayers", JSON.stringify(players));
+			}
+
+			// Menu principal
+			function showMenu() {
+				document.getElementById("formbox").style.display = "none";
+				const container = document.getElementById("mainContainer");
+				container.innerHTML = "";
+				const search = document.createElement("input");
+				search.id = "playerSearch";
+				search.placeholder = "Rechercher un joueur...";
+				search.oninput = render;
+				container.appendChild(search);
+				const grid = document.createElement("div");
+				grid.className = "card-grid";
+				container.appendChild(grid);
+				render();
+				function render() {
+					const q = search.value.toLowerCase();
+					grid.innerHTML = "";
+					Object.keys(players)
+						.filter(
+							(k) =>
+								k.toLowerCase().includes(q) ||
+								players[k].pseudo.toLowerCase().includes(q)
+						)
+						.forEach((k) => {
+							const p = players[k];
+							const card = document.createElement("div");
+							card.className = "card";
+							card.onclick = () => showPlayer(k);
+							card.innerHTML = `<img src="${
+								p.image || "assets/Lettre _W_ en noir et blanc.png"
+							}"><strong>${p.fullname}</strong><br>${p.pseudo || ""}`;
+							grid.appendChild(card);
+						});
+					const add = document.createElement("div");
+					add.className = "card add-card";
+					add.textContent = "+";
+					add.onclick = openAdd;
+					grid.appendChild(add);
+				}
+			}
+
+			// === Sélecteurs nationalités ===
+			function setupNatInput(inputId, suggestId, listId, isSport = false) {
+				const input = document.getElementById(inputId);
+				const suggest = document.getElementById(suggestId);
+				const list = document.getElementById(listId);
+				input.oninput = () => {
+					suggest.innerHTML = "";
+					const val = input.value.toLowerCase();
+					if (!val) return;
+					countries
+						.filter(
+							(c) =>
+								c.fr.toLowerCase().includes(val) ||
+								c.en.toLowerCase().includes(val)
+						)
+						.forEach((c) => {
+							const div = document.createElement("div");
+							div.innerHTML = `<img src="flags/${c.en}.png"> ${c.fr}`;
+							div.onclick = () => {
+								addFlag(list, c);
+								input.value = "";
+								suggest.innerHTML = "";
+								if (isSport) list.innerHTML = ""; // une seule sportive
+							};
+							suggest.appendChild(div);
+						});
+				};
+			}
+			function addFlag(list, c) {
+				if (
+					[...list.querySelectorAll(".flag-item")].some(
+						(f) => f.dataset.en === c.en
+					)
+				)
+					return;
+				const div = document.createElement("div");
+				div.className = "flag-item";
+				div.dataset.en = c.en;
+				div.innerHTML = `<img src="flags/${c.en}.png"><span>${c.fr}</span> <button onclick="this.parentNode.remove()">✕</button>`;
+				list.appendChild(div);
+			}
+			function getFlags(listId) {
+				return [...document.getElementById(listId).children].map((f) => ({
+					fr: f.querySelector("span").textContent,
+					en: f.dataset.en,
+				}));
+			}
+			setupNatInput("natSearch", "natSuggest", "natList");
+			setupNatInput("sportNatSearch", "sportNatSuggest", "sportNatList", true);
+
+			// === Champs dynamiques ===
+			function addCareerRow(data = ["", "", "", ""]) {
+				const row = document.createElement("div");
+				row.style.display = "grid";
+				row.style.gridTemplateColumns = "120px 1fr 80px 80px";
+				row.style.gap = "4px";
+				row.style.marginBottom = "4px";
+				["Période", "Club", "Matchs", "Buts"].forEach((ph, i) => {
+					const inp = document.createElement("input");
+					inp.value = data[i] || "";
+					inp.placeholder = ph;
+					if (i >= 2) inp.type = "number";
+					row.appendChild(inp);
+				});
+				document.getElementById("careerList").appendChild(row);
+			}
+			function parseCareer() {
+				return Array.from(document.querySelectorAll("#careerList div")).map(
+					(r) => [...r.querySelectorAll("input")].map((i) => i.value.trim())
+				);
+			}
+			function addJuniorRow(data = ["", ""]) {
+				const row = document.createElement("div");
+				row.style.display = "grid";
+				row.style.gridTemplateColumns = "120px 1fr";
+				row.style.gap = "4px";
+				row.style.marginBottom = "4px";
+				["Période", "Club junior"].forEach((ph, i) => {
+					const inp = document.createElement("input");
+					inp.value = data[i] || "";
+					inp.placeholder = ph;
+					row.appendChild(inp);
+				});
+				document.getElementById("juniorList").appendChild(row);
+			}
+			function parseJunior() {
+				return Array.from(document.querySelectorAll("#juniorList div")).map(
+					(r) => [...r.querySelectorAll("input")].map((i) => i.value.trim())
+				);
+			}
+
+			// === Sélections nationales ===
+			function addNationalRow(data = ["", "", "", ""]) {
+				const row = document.createElement("div");
+				row.style.display = "grid";
+				row.style.gridTemplateColumns = "120px 1fr 80px 80px";
+				row.style.gap = "4px";
+				row.style.marginBottom = "4px";
+				["Période", "Équipe nationale", "Sélections", "Buts"].forEach(
+					(ph, i) => {
+						const inp = document.createElement("input");
+						inp.value = data[i] || "";
+						inp.placeholder = ph;
+						if (i >= 2) inp.type = "number";
+						row.appendChild(inp);
+					}
+				);
+				document.getElementById("nationalList").appendChild(row);
+			}
+			function parseNational() {
+				return Array.from(document.querySelectorAll("#nationalList div")).map(
+					(r) => [...r.querySelectorAll("input")].map((i) => i.value.trim())
+				);
+			}
+
+			// === Formulaire ===
+			function openAdd() {
+				clearForm();
+				editingKey = null;
+				document.getElementById("formTitle").textContent = "Ajouter un joueur";
+				document.getElementById("formbox").style.display = "flex";
+			}
+			function openEdit(key) {
+				clearForm();
+				editingKey = key;
+				const p = players[key];
+				document.getElementById("formTitle").textContent = "Modifier le joueur";
+				document.getElementById("fn").value = p.fullname;
+				document.getElementById("pn").value = p.pseudo;
+				document.getElementById("birth").value = p.birth;
+				document.getElementById("pos").value = p.pos;
+				if (p.dob) {
+					const [d, m, y] = p.dob.split("/");
+					daySelect.value = d;
+					monthSelect.value = m;
+					yearSelect.value = y;
+				}
+				document.getElementById("height").value = p.height || "";
+				document.getElementById("foot").value = p.foot || "";
+				if (p.nats)
+					p.nats.forEach((c) => addFlag(document.getElementById("natList"), c));
+				if (p.sportNat)
+					addFlag(document.getElementById("sportNatList"), p.sportNat);
+				document.getElementById("juniorList").innerHTML = "";
+				if (p.junior) p.junior.forEach((r) => addJuniorRow(r));
+				document.getElementById("careerList").innerHTML = "";
+				if (p.career) p.career.forEach((r) => addCareerRow(r));
+				document.getElementById("nationalList").innerHTML = "";
+				if (p.national) p.national.forEach((r) => addNationalRow(r));
+				document.getElementById("preview").src = p.image;
+				document.getElementById("formbox").style.display = "flex";
+			}
+			function closeForm() {
+				document.getElementById("formbox").style.display = "none";
+			}
+			function clearForm() {
+				["fn", "pn", "birth", "pos", "height"].forEach(
+					(id) => (document.getElementById(id).value = "")
+				);
+				document.getElementById("foot").value = "";
+				document.getElementById("natList").innerHTML = "";
+				document.getElementById("sportNatList").innerHTML = "";
+				document.getElementById("juniorList").innerHTML = "";
+				document.getElementById("careerList").innerHTML = "";
+				document.getElementById("nationalList").innerHTML = "";
+				document.getElementById("preview").src = "";
+				document.getElementById("fileName").textContent = "";
+				daySelect.value = 1;
+				monthSelect.value = 1;
+				yearSelect.value = new Date().getFullYear();
+			}
+			document.getElementById("uploadBtn").onclick = () =>
+				document.getElementById("uploadImg").click();
+			document.getElementById("uploadImg").onchange = (e) => {
+				const f = e.target.files[0];
+				if (f) {
+					const url = URL.createObjectURL(f);
+					document.getElementById("preview").src = url;
+					document.getElementById("fileName").textContent = f.name;
+				}
+			};
+			function savePlayer() {
+				const fn = document.getElementById("fn").value.trim();
+				if (!fn) {
+					alert("Nom requis");
+					return;
+				}
+				const key = editingKey || fn;
+				const p = {
+					fullname: fn,
+					pseudo: document.getElementById("pn").value.trim(),
+					dob: `${daySelect.value}/${monthSelect.value}/${yearSelect.value}`,
+					birth: document.getElementById("birth").value.trim(),
+					pos: document.getElementById("pos").value.trim(),
+					height: document.getElementById("height").value.trim(),
+					foot: document.getElementById("foot").value,
+					nats: getFlags("natList"),
+					sportNat: getFlags("sportNatList")[0] || null,
+					junior: parseJunior(),
+					career: parseCareer(),
+					national: parseNational(),
+					image: document.getElementById("preview").src || "",
+				};
+				let matches = 0,
+					goals = 0;
+				p.career.forEach((r) => {
+					matches += parseInt(r[2]) || 0;
+					goals += parseInt(r[3]) || 0;
+				});
+				p.totals = { matches, goals };
+				let caps = 0,
+					natGoals = 0;
+				p.national.forEach((r) => {
+					caps += parseInt(r[2]) || 0;
+					natGoals += parseInt(r[3]) || 0;
+				});
+				p.natTotals = { caps, natGoals };
+				players[key] = p;
+				saveToStorage();
+				closeForm();
+				showMenu();
+			}
+
+			// === Fiche joueur ===
+			function showPlayer(key) {
+				const p = players[key];
+				const c = document.getElementById("mainContainer");
+				c.innerHTML = "";
+				const div = document.createElement("div");
+				div.className = "form-container";
+				const natHtml = p.nats
+					.map(
+						(c) =>
+							`<div class="flag-item"><img src="flags/${c.en}.png">${c.fr}</div>`
+					)
+					.join("");
+				const sportHtml = p.sportNat
+					? `<div class="flag-item"><img src="flags/${p.sportNat.en}.png">${p.sportNat.fr}</div>`
+					: "";
+				let juniorHtml = p.junior.length
+					? "<h4>Parcours junior</h4><ul>" +
+					  p.junior.map((r) => `<li>${r[0]} — ${r[1]}</li>`).join("") +
+					  "</ul>"
+					: "";
+				let careerHtml =
+					"<h4>Carrière pro</h4><table><thead><tr><th>Période</th><th>Club</th><th>Matchs</th><th>Buts</th></tr></thead><tbody>" +
+					p.career
+						.map(
+							(r) =>
+								`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`
+						)
+						.join("") +
+					"</tbody></table>";
+				let nationalHtml = p.national.length
+					? "<h4>Sélections nationales</h4><table><thead><tr><th>Période</th><th>Équipe</th><th>Sélections</th><th>Buts</th></tr></thead><tbody>" +
+					  p.national
+							.map(
+								(r) =>
+									`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`
+							)
+							.join("") +
+					  "</tbody></table>"
+					: "";
+				div.innerHTML = `<div style="display:flex;gap:12px;align-items:center">
+    <div style="width:96px;height:128px;background:#eee;overflow:hidden"><img src="${
+			p.image
+		}" style="width:100%;height:100%;object-fit:cover"></div>
     <div>
-      <label>Nom complet</label><input id="fn">
-      <label>Pseudo (facultatif)</label><input id="pn">
-
-      <label>Date de naissance</label>
-      <div style="display:flex;gap:4px;">
-        <select id="dob_day"></select>
-        <select id="dob_month"></select>
-        <select id="dob_year"></select>
-      </div>
-
-      <label>Lieu de naissance</label><input id="birth">
-
-      <label>Nationalité(s)</label>
-      <div class="search-box">
-        <input id="natSearch" placeholder="Rechercher un pays...">
-        <div class="suggestions" id="natSuggest"></div>
-      </div>
-      <div class="flag-list" id="natList"></div>
-
-      <label>Nationalité sportive</label>
-      <div class="search-box">
-        <input id="sportNatSearch" placeholder="Rechercher un pays...">
-        <div class="suggestions" id="sportNatSuggest"></div>
-      </div>
-      <div class="flag-list" id="sportNatList"></div>
-
-      <label>Taille (cm)</label><input id="height" type="number" placeholder="ex: 182">
-
-      <label>Pied fort</label>
-      <select id="foot">
-        <option value="">-- Sélectionner --</option>
-        <option value="Gauche">Gauche</option>
-        <option value="Droit">Droit</option>
-        <option value="Ambidextre">Ambidextre</option>
-      </select>
-
-      <label>Poste</label><input id="pos">
-
-      <label>Parcours junior</label>
-      <div id="juniorList"></div>
-      <button type="button" class="action-btn" onclick="addJuniorRow()">+ Ajouter un club junior</button>
-
-      <label>Carrière pro</label>
-      <div id="careerList"></div>
-      <button type="button" class="action-btn" onclick="addCareerRow()">+ Ajouter une étape</button>
-
-      <label>Équipe nationale</label>
-      <div id="nationalList"></div>
-      <button type="button" class="action-btn" onclick="addNationalRow()">+ Ajouter une sélection</button>
-
-      <label>Image</label>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button type="button" id="uploadBtn">Choisir une image</button>
-        <span id="fileName" style="font-size:13px;color:#555"></span>
-      </div>
-      <input type="file" id="uploadImg" accept="image/*" style="display:none">
-      <img id="preview" style="max-width:120px;margin-top:8px;display:block">
-
-      <div style="margin-top:12px;">
-        <button class="action-btn" onclick="savePlayer()">Enregistrer</button>
-        <button class="action-btn" style="background:#eee;color:#111;" onclick="closeForm()">Annuler</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-// === Liste de TOUS les pays du monde ===
-// Format: {fr:"France", en:"france"} => drapeau = flags/france.png
-// ⚠️ Ici j’en mets un extrait pour exemple. Tu peux coller la liste complète ISO3166 FR/EN.
-const countries = [
- {fr:"France",en:"france"},
- {fr:"Allemagne",en:"germany"},
- {fr:"Italie",en:"italy"},
- {fr:"Espagne",en:"spain"},
- {fr:"Portugal",en:"portugal"},
- {fr:"Angleterre",en:"england"},
- {fr:"États-Unis",en:"usa"},
- {fr:"Brésil",en:"brazil"},
- {fr:"Argentine",en:"argentina"},
- {fr:"Canada",en:"canada"},
- {fr:"Mexique",en:"mexico"},
- {fr:"Japon",en:"japan"},
- {fr:"Chine",en:"china"},
- {fr:"Corée du Sud",en:"south-korea"},
- {fr:"Nigéria",en:"nigeria"},
- {fr:"Égypte",en:"egypt"},
- {fr:"Maroc",en:"morocco"},
- {fr:"Afghanistan",en:"afghanistan"},
- {fr:"Afrique du Sud",en:"south-africa"},
- {fr:"Albanie",en:"albania"},
- {fr:"Algérie",en:"algeria"},
- {fr:"Allemagne",en:"germany"},
- {fr:"Andorre",en:"andorra"},
- {fr:"Angola",en:"angola"},
- {fr:"Antigua-et-Barbuda",en:"antigua-and-barbuda"},
- {fr:"Arabie saoudite",en:"saudi-arabia"},
- {fr:"Argentine",en:"argentina"},
- {fr:"Arménie",en:"armenia"},
- {fr:"Australie",en:"australia"},
- {fr:"Autriche",en:"austria"},
- {fr:"Azerbaïdjan",en:"azerbaijan"},
- {fr:"Bahamas",en:"bahamas"},
- {fr:"Bahreïn",en:"bahrain"},
- {fr:"Bangladesh",en:"bangladesh"},
- {fr:"Barbade",en:"barbados"},
- {fr:"Belgique",en:"belgium"},
- {fr:"Belize",en:"belize"},
- {fr:"Bénin",en:"benin"},
- {fr:"Bhoutan",en:"bhutan"},
- {fr:"Biélorussie",en:"belarus"},
- {fr:"Birmanie",en:"myanmar"},
- {fr:"Bolivie",en:"bolivia"},
- {fr:"Bosnie-Herzégovine",en:"bosnia-and-herzegovina"},
- {fr:"Botswana",en:"botswana"},
- {fr:"Brésil",en:"brazil"},
- {fr:"Brunei",en:"brunei"},
- {fr:"Bulgarie",en:"bulgaria"},
- {fr:"Burkina Faso",en:"burkina-faso"},
- {fr:"Burundi",en:"burundi"},
- {fr:"Cambodge",en:"cambodia"},
- {fr:"Cameroun",en:"cameroon"},
- {fr:"Canada",en:"canada"},
- {fr:"Cap-Vert",en:"cape-verde"},
- {fr:"Chili",en:"chile"},
- {fr:"Chine",en:"china"},
- {fr:"Chypre",en:"cyprus"},
- {fr:"Colombie",en:"colombia"},
- {fr:"Comores",en:"comoros"},
- {fr:"Congo-Brazzaville",en:"congo"},
- {fr:"Congo-Kinshasa",en:"democratic-republic-of-the-congo"},
- {fr:"Corée du Nord",en:"north-korea"},
- {fr:"Corée du Sud",en:"south-korea"},
- {fr:"Costa Rica",en:"costa-rica"},
- {fr:"Côte d'Ivoire",en:"ivory-coast"},
- {fr:"Croatie",en:"croatia"},
- {fr:"Cuba",en:"cuba"},
- {fr:"Danemark",en:"denmark"},
- {fr:"Djibouti",en:"djibouti"},
- {fr:"Dominique",en:"dominica"},
- {fr:"Égypte",en:"egypt"},
- {fr:"Émirats arabes unis",en:"united-arab-emirates"},
- {fr:"Équateur",en:"ecuador"},
- {fr:"Érythrée",en:"eritrea"},
- {fr:"Espagne",en:"spain"},
- {fr:"Estonie",en:"estonia"},
- {fr:"Eswatini",en:"eswatini"},
- {fr:"États-Unis",en:"usa"},
- {fr:"Éthiopie",en:"ethiopia"},
- {fr:"Fidji",en:"fiji"},
- {fr:"Finlande",en:"finland"},
- {fr:"France",en:"france"},
- {fr:"Gabon",en:"gabon"},
- {fr:"Gambie",en:"gambia"},
- {fr:"Géorgie",en:"georgia"},
- {fr:"Ghana",en:"ghana"},
- {fr:"Grèce",en:"greece"},
- {fr:"Grenade",en:"grenada"},
- {fr:"Guatemala",en:"guatemala"},
- {fr:"Guinée",en:"guinea"},
- {fr:"Guinée-Bissau",en:"guinea-bissau"},
- {fr:"Guinée équatoriale",en:"equatorial-guinea"},
- {fr:"Guyana",en:"guyana"},
- {fr:"Haïti",en:"haiti"},
- {fr:"Honduras",en:"honduras"},
- {fr:"Hongrie",en:"hungary"},
- {fr:"Îles Marshall",en:"marshall-islands"},
- {fr:"Îles Salomon",en:"solomon-islands"},
- {fr:"Inde",en:"india"},
- {fr:"Indonésie",en:"indonesia"},
- {fr:"Irak",en:"iraq"},
- {fr:"Iran",en:"iran"},
- {fr:"Irlande",en:"ireland"},
- {fr:"Islande",en:"iceland"},
- {fr:"Israël",en:"israel"},
- {fr:"Italie",en:"italy"},
- {fr:"Jamaïque",en:"jamaica"},
- {fr:"Japon",en:"japan"},
- {fr:"Jordanie",en:"jordan"},
- {fr:"Kazakhstan",en:"kazakhstan"},
- {fr:"Kenya",en:"kenya"},
- {fr:"Kirghizistan",en:"kyrgyzstan"},
- {fr:"Kiribati",en:"kiribati"},
- {fr:"Kosovo",en:"kosovo"},
- {fr:"Koweït",en:"kuwait"},
- {fr:"Laos",en:"laos"},
- {fr:"Lesotho",en:"lesotho"},
- {fr:"Lettonie",en:"latvia"},
- {fr:"Liban",en:"lebanon"},
- {fr:"Libéria",en:"liberia"},
- {fr:"Libye",en:"libya"},
- {fr:"Liechtenstein",en:"liechtenstein"},
- {fr:"Lituanie",en:"lithuania"},
- {fr:"Luxembourg",en:"luxembourg"},
- {fr:"Macédoine du Nord",en:"north-macedonia"},
- {fr:"Madagascar",en:"madagascar"},
- {fr:"Malaisie",en:"malaysia"},
- {fr:"Malawi",en:"malawi"},
- {fr:"Maldives",en:"maldives"},
- {fr:"Mali",en:"mali"},
- {fr:"Malte",en:"malta"},
- {fr:"Maroc",en:"morocco"},
- {fr:"Maurice",en:"mauritius"},
- {fr:"Mauritanie",en:"mauritania"},
- {fr:"Mexique",en:"mexico"},
- {fr:"Micronésie",en:"micronesia"},
- {fr:"Moldavie",en:"moldova"},
- {fr:"Monaco",en:"monaco"},
- {fr:"Mongolie",en:"mongolia"},
- {fr:"Monténégro",en:"montenegro"},
- {fr:"Mozambique",en:"mozambique"},
- {fr:"Namibie",en:"namibia"},
- {fr:"Nauru",en:"nauru"},
- {fr:"Népal",en:"nepal"},
- {fr:"Nicaragua",en:"nicaragua"},
- {fr:"Niger",en:"niger"},
- {fr:"Nigéria",en:"nigeria"},
- {fr:"Norvège",en:"norway"},
- {fr:"Nouvelle-Zélande",en:"new-zealand"},
- {fr:"Oman",en:"oman"},
- {fr:"Ouganda",en:"uganda"},
- {fr:"Ouzbékistan",en:"uzbekistan"},
- {fr:"Pakistan",en:"pakistan"},
- {fr:"Palaos",en:"palau"},
- {fr:"Palestine",en:"palestine"},
- {fr:"Panama",en:"panama"},
- {fr:"Papouasie-Nouvelle-Guinée",en:"papua-new-guinea"},
- {fr:"Paraguay",en:"paraguay"},
- {fr:"Pays-Bas",en:"netherlands"},
- {fr:"Pérou",en:"peru"},
- {fr:"Philippines",en:"philippines"},
- {fr:"Pologne",en:"poland"},
- {fr:"Portugal",en:"portugal"},
- {fr:"Qatar",en:"qatar"},
- {fr:"République centrafricaine",en:"central-african-republic"},
- {fr:"République dominicaine",en:"dominican-republic"},
- {fr:"République tchèque",en:"czechia"},
- {fr:"Roumanie",en:"romania"},
- {fr:"Royaume-Uni",en:"united-kingdom"},
- {fr:"Russie",en:"russia"},
- {fr:"Rwanda",en:"rwanda"},
- {fr:"Saint-Christophe-et-Niévès",en:"saint-kitts-and-nevis"},
- {fr:"Sainte-Lucie",en:"saint-lucia"},
- {fr:"Saint-Marin",en:"san-marino"},
- {fr:"Saint-Vincent-et-les-Grenadines",en:"saint-vincent-and-the-grenadines"},
- {fr:"Salvador",en:"el-salvador"},
- {fr:"Samoa",en:"samoa"},
- {fr:"Sao Tomé-et-Principe",en:"sao-tome-and-principe"},
- {fr:"Sénégal",en:"senegal"},
- {fr:"Serbie",en:"serbia"},
- {fr:"Seychelles",en:"seychelles"},
- {fr:"Sierra Leone",en:"sierra-leone"},
- {fr:"Singapour",en:"singapore"},
- {fr:"Slovaquie",en:"slovakia"},
- {fr:"Slovénie",en:"slovenia"},
- {fr:"Somalie",en:"somalia"},
- {fr:"Soudan",en:"sudan"},
- {fr:"Soudan du Sud",en:"south-sudan"},
- {fr:"Sri Lanka",en:"sri-lanka"},
- {fr:"Suède",en:"sweden"},
- {fr:"Suisse",en:"switzerland"},
- {fr:"Suriname",en:"suriname"},
- {fr:"Syrie",en:"syria"},
- {fr:"Tadjikistan",en:"tajikistan"},
- {fr:"Tanzanie",en:"tanzania"},
- {fr:"Tchad",en:"chad"},
- {fr:"Thaïlande",en:"thailand"},
- {fr:"Timor oriental",en:"east-timor"},
- {fr:"Togo",en:"togo"},
- {fr:"Tonga",en:"tonga"},
- {fr:"Trinité-et-Tobago",en:"trinidad-and-tobago"},
- {fr:"Tunisie",en:"tunisia"},
- {fr:"Turkménistan",en:"turkmenistan"},
- {fr:"Turquie",en:"turkey"},
- {fr:"Tuvalu",en:"tuvalu"},
- {fr:"Ukraine",en:"ukraine"},
- {fr:"Uruguay",en:"uruguay"},
- {fr:"Vanuatu",en:"vanuatu"},
- {fr:"Vatican",en:"vatican"},
- {fr:"Venezuela",en:"venezuela"},
- {fr:"Viêt Nam",en:"vietnam"},
- {fr:"Yémen",en:"yemen"},
- {fr:"Zambie",en:"zambia"},
- {fr:"Zimbabwe",en:"zimbabwe"}
-]
-
-const players={};
-let editingKey=null;
-
-// init date select
-const daySelect=document.getElementById('dob_day');
-const monthSelect=document.getElementById('dob_month');
-const yearSelect=document.getElementById('dob_year');
-for(let d=1;d<=31;d++) daySelect.add(new Option(d,d));
-["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"].forEach((m,i)=>monthSelect.add(new Option(m,i+1)));
-for(let y=new Date().getFullYear();y>=1900;y--) yearSelect.add(new Option(y,y));
-
-const saved=localStorage.getItem("wokipediaPlayers");
-if(saved) Object.assign(players, JSON.parse(saved));
-function saveToStorage(){ localStorage.setItem("wokipediaPlayers",JSON.stringify(players)); }
-
-// Menu principal
-function showMenu(){
-  document.getElementById('formbox').style.display='none';
-  const container=document.getElementById('mainContainer'); container.innerHTML='';
-  const search=document.createElement('input'); search.id='playerSearch'; search.placeholder='Rechercher un joueur...'; search.oninput=render; container.appendChild(search);
-  const grid=document.createElement('div'); grid.className='card-grid'; container.appendChild(grid);
-  render();
-  function render(){
-    const q=search.value.toLowerCase(); grid.innerHTML='';
-    Object.keys(players).filter(k=>k.toLowerCase().includes(q)||players[k].pseudo.toLowerCase().includes(q)).forEach(k=>{
-      const p=players[k];
-      const card=document.createElement('div'); card.className='card'; card.onclick=()=>showPlayer(k);
-      card.innerHTML=`<img src="${p.image||'assets/Lettre _W_ en noir et blanc.png'}"><strong>${p.fullname}</strong><br>${p.pseudo||''}`;
-      grid.appendChild(card);
-    });
-    const add=document.createElement('div'); add.className='card add-card'; add.textContent='+'; add.onclick=openAdd; grid.appendChild(add);
-  }
-}
-
-// === Sélecteurs nationalités ===
-function setupNatInput(inputId,suggestId,listId,isSport=false){
-  const input=document.getElementById(inputId);
-  const suggest=document.getElementById(suggestId);
-  const list=document.getElementById(listId);
-  input.oninput=()=>{
-    suggest.innerHTML='';
-    const val=input.value.toLowerCase();
-    if(!val) return;
-    countries.filter(c=>c.fr.toLowerCase().includes(val)||c.en.toLowerCase().includes(val)).forEach(c=>{
-      const div=document.createElement('div');
-      div.innerHTML=`<img src="flags/${c.en}.png"> ${c.fr}`;
-      div.onclick=()=>{
-        addFlag(list,c); input.value=''; suggest.innerHTML='';
-        if(isSport) list.innerHTML=''; // une seule sportive
-      };
-      suggest.appendChild(div);
-    });
-  };
-}
-function addFlag(list,c){
-  if([...list.querySelectorAll('.flag-item')].some(f=>f.dataset.en===c.en)) return;
-  const div=document.createElement('div'); div.className='flag-item'; div.dataset.en=c.en;
-  div.innerHTML=`<img src="flags/${c.en}.png"><span>${c.fr}</span> <button onclick="this.parentNode.remove()">✕</button>`;
-  list.appendChild(div);
-}
-function getFlags(listId){
-  return [...document.getElementById(listId).children].map(f=>({fr:f.querySelector('span').textContent,en:f.dataset.en}));
-}
-setupNatInput('natSearch','natSuggest','natList');
-setupNatInput('sportNatSearch','sportNatSuggest','sportNatList',true);
-
-// === Champs dynamiques ===
-function addCareerRow(data=["","","",""]){
-  const row=document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr 80px 80px"; row.style.gap="4px"; row.style.marginBottom="4px";
-  ["Période","Club","Matchs","Buts"].forEach((ph,i)=>{ const inp=document.createElement("input"); inp.value=data[i]||""; inp.placeholder=ph; if(i>=2)inp.type="number"; row.appendChild(inp); });
-  document.getElementById("careerList").appendChild(row);
-}
-function parseCareer(){ return Array.from(document.querySelectorAll("#careerList div")).map(r=>[...r.querySelectorAll("input")].map(i=>i.value.trim())); }
-function addJuniorRow(data=["",""]){
-  const row=document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr"; row.style.gap="4px"; row.style.marginBottom="4px";
-  ["Période","Club junior"].forEach((ph,i)=>{ const inp=document.createElement("input"); inp.value=data[i]||""; inp.placeholder=ph; row.appendChild(inp); });
-  document.getElementById("juniorList").appendChild(row);
-}
-function parseJunior(){ return Array.from(document.querySelectorAll("#juniorList div")).map(r=>[...r.querySelectorAll("input")].map(i=>i.value.trim())); }
-
-// === Sélections nationales ===
-function addNationalRow(data=["","","",""]){
-  const row=document.createElement("div"); row.style.display="grid"; row.style.gridTemplateColumns="120px 1fr 80px 80px"; row.style.gap="4px"; row.style.marginBottom="4px";
-  ["Période","Équipe nationale","Sélections","Buts"].forEach((ph,i)=>{ const inp=document.createElement("input"); inp.value=data[i]||""; inp.placeholder=ph; if(i>=2)inp.type="number"; row.appendChild(inp); });
-  document.getElementById("nationalList").appendChild(row);
-}
-function parseNational(){ return Array.from(document.querySelectorAll("#nationalList div")).map(r=>[...r.querySelectorAll("input")].map(i=>i.value.trim())); }
-
-// === Formulaire ===
-function openAdd(){ clearForm(); editingKey=null; document.getElementById('formTitle').textContent="Ajouter un joueur"; document.getElementById('formbox').style.display='flex'; }
-function openEdit(key){
-  clearForm(); editingKey=key; const p=players[key];
-  document.getElementById('formTitle').textContent="Modifier le joueur";
-  document.getElementById('fn').value=p.fullname; document.getElementById('pn').value=p.pseudo;
-  document.getElementById('birth').value=p.birth; document.getElementById('pos').value=p.pos;
-  if(p.dob){const [d,m,y]=p.dob.split('/'); daySelect.value=d; monthSelect.value=m; yearSelect.value=y;}
-  document.getElementById('height').value=p.height||''; document.getElementById('foot').value=p.foot||'';
-  if(p.nats) p.nats.forEach(c=>addFlag(document.getElementById('natList'),c));
-  if(p.sportNat) addFlag(document.getElementById('sportNatList'),p.sportNat);
-  document.getElementById('juniorList').innerHTML=''; if(p.junior)p.junior.forEach(r=>addJuniorRow(r));
-  document.getElementById('careerList').innerHTML=''; if(p.career)p.career.forEach(r=>addCareerRow(r));
-  document.getElementById('nationalList').innerHTML=''; if(p.national)p.national.forEach(r=>addNationalRow(r));
-  document.getElementById('preview').src=p.image;
-  document.getElementById('formbox').style.display='flex';
-}
-function closeForm(){document.getElementById('formbox').style.display='none';}
-function clearForm(){
-  ['fn','pn','birth','pos','height'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('foot').value='';
-  document.getElementById('natList').innerHTML=''; document.getElementById('sportNatList').innerHTML='';
-  document.getElementById('juniorList').innerHTML=''; document.getElementById('careerList').innerHTML='';
-  document.getElementById('nationalList').innerHTML=''; document.getElementById('preview').src=''; document.getElementById('fileName').textContent='';
-  daySelect.value=1; monthSelect.value=1; yearSelect.value=new Date().getFullYear();
-}
-document.getElementById('uploadBtn').onclick=()=>document.getElementById('uploadImg').click();
-document.getElementById('uploadImg').onchange=e=>{const f=e.target.files[0]; if(f){const url=URL.createObjectURL(f); document.getElementById('preview').src=url; document.getElementById('fileName').textContent=f.name; }}
-function savePlayer(){
-  const fn=document.getElementById('fn').value.trim(); if(!fn){alert('Nom requis'); return;}
-  const key=editingKey||fn;
-  const p={ fullname:fn, pseudo:document.getElementById('pn').value.trim(), dob:`${daySelect.value}/${monthSelect.value}/${yearSelect.value}`,
-    birth:document.getElementById('birth').value.trim(), pos:document.getElementById('pos').value.trim(),
-    height:document.getElementById('height').value.trim(), foot:document.getElementById('foot').value,
-    nats:getFlags('natList'), sportNat:getFlags('sportNatList')[0]||null,
-    junior:parseJunior(), career:parseCareer(), national:parseNational(),
-    image:document.getElementById('preview').src||'' };
-  let matches=0, goals=0; p.career.forEach(r=>{matches+=parseInt(r[2])||0; goals+=parseInt(r[3])||0;}); p.totals={matches,goals};
-  let caps=0, natGoals=0; p.national.forEach(r=>{caps+=parseInt(r[2])||0; natGoals+=parseInt(r[3])||0;}); p.natTotals={caps,natGoals};
-  players[key]=p; saveToStorage(); closeForm(); showMenu();
-}
-
-// === Fiche joueur ===
-function showPlayer(key){
-  const p=players[key]; const c=document.getElementById('mainContainer'); c.innerHTML='';
-  const div=document.createElement('div'); div.className='form-container';
-  const natHtml=p.nats.map(c=>`<div class="flag-item"><img src="flags/${c.en}.png">${c.fr}</div>`).join('');
-  const sportHtml=p.sportNat?`<div class="flag-item"><img src="flags/${p.sportNat.en}.png">${p.sportNat.fr}</div>`:'';
-  let juniorHtml=p.junior.length?'<h4>Parcours junior</h4><ul>'+p.junior.map(r=>`<li>${r[0]} — ${r[1]}</li>`).join('')+'</ul>':'';
-  let careerHtml='<h4>Carrière pro</h4><table><thead><tr><th>Période</th><th>Club</th><th>Matchs</th><th>Buts</th></tr></thead><tbody>'+p.career.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')+'</tbody></table>';
-  let nationalHtml=p.national.length?'<h4>Sélections nationales</h4><table><thead><tr><th>Période</th><th>Équipe</th><th>Sélections</th><th>Buts</th></tr></thead><tbody>'+p.national.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')+'</tbody></table>':'';
-  div.innerHTML=`<div style="display:flex;gap:12px;align-items:center">
-    <div style="width:96px;height:128px;background:#eee;overflow:hidden"><img src="${p.image}" style="width:100%;height:100%;object-fit:cover"></div>
-    <div>
-      <h2>${p.fullname}</h2>${p.pseudo?'<span>'+p.pseudo+'</span><br>':''}
+      <h2>${p.fullname}</h2>${
+					p.pseudo ? "<span>" + p.pseudo + "</span><br>" : ""
+				}
       <span>${p.pos} • ${p.dob} • ${p.birth}</span><br>
-      ${p.height?'<strong>Taille:</strong> '+p.height+' cm<br>':''}
-      ${p.foot?'<strong>Pied fort:</strong> '+p.foot+'<br>':''}
-      ${p.nats.length?'<strong>Nationalités:</strong>'+natHtml:''}
-      ${p.sportNat?'<strong>Nationalité sportive:</strong>'+sportHtml:''}
+      ${p.height ? "<strong>Taille:</strong> " + p.height + " cm<br>" : ""}
+      ${p.foot ? "<strong>Pied fort:</strong> " + p.foot + "<br>" : ""}
+      ${p.nats.length ? "<strong>Nationalités:</strong>" + natHtml : ""}
+      ${p.sportNat ? "<strong>Nationalité sportive:</strong>" + sportHtml : ""}
     </div>
   </div>
   ${juniorHtml}
   ${careerHtml}
   ${nationalHtml}
-  <div><strong>Totaux club:</strong> ${p.totals.matches} matchs — ${p.totals.goals} buts</div>
-  <div><strong>Totaux sélection:</strong> ${p.natTotals.caps} sélections — ${p.natTotals.natGoals} buts</div>
+  <div><strong>Totaux club:</strong> ${p.totals.matches} matchs — ${
+					p.totals.goals
+				} buts</div>
+  <div><strong>Totaux sélection:</strong> ${p.natTotals.caps} sélections — ${
+					p.natTotals.natGoals
+				} buts</div>
   <div style="margin-top:12px;">
     <button class="action-btn" onclick="openEdit('${key}')">Modifier</button>
     <button class="action-btn danger" onclick="deletePlayer('${key}')">Supprimer</button>
     <button class="action-btn" onclick="showMenu()">Retour</button>
   </div>`;
-  c.appendChild(div);
-}
-function deletePlayer(key){ if(confirm("Supprimer ce joueur ?")){ delete players[key]; saveToStorage(); showMenu(); } }
+				c.appendChild(div);
+			}
+			function deletePlayer(key) {
+				if (confirm("Supprimer ce joueur ?")) {
+					delete players[key];
+					saveToStorage();
+					showMenu();
+				}
+			}
 
-showMenu();
-</script>
-</body>
+			showMenu();
+		</script>
+	</body>
 </html>
